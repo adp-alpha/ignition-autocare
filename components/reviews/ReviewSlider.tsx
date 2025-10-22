@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import { reviews as fallbackReviews, Review } from "@/data/reviews";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { reviews as fallbackReviews, Review } from "@/data/reviews";
+import { useCallback, useEffect, useState } from "react";
 import ReviewCard from "./ReviewCard";
 
 const ReviewSlider = () => {
   const [reviews, setReviews] = useState<Review[]>(fallbackReviews);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -19,7 +19,7 @@ const ReviewSlider = () => {
   useEffect(() => {
     const fetchGoogleReviews = async () => {
       try {
-        const response = await fetch("/api/google-reviews?limit=6&fiveStarOnly=true");
+        const response = await fetch("/api/google-reviews?limit=30");
         const data = await response.json();
 
         if (data.success && data.reviews.length > 0) {
@@ -65,12 +65,12 @@ const ReviewSlider = () => {
     <div className="relative w-full max-w-4xl mx-auto">
       {error && process.env.NODE_ENV === 'development' && (
         <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800 text-center">
-          {error === "Using default reviews" 
-            ? "⚠️ Showing sample reviews (Google API not configured)" 
+          {error === "Using default reviews"
+            ? "⚠️ Showing sample reviews (Google API not configured)"
             : "⚠️ Could not load Google reviews, showing samples"}
         </div>
       )}
-      
+
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex -ml-4 my-1">
           {reviews.map((review, index) => (
@@ -80,7 +80,7 @@ const ReviewSlider = () => {
           ))}
         </div>
       </div>
-      
+
       <button
         className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md -ml-6 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
         onClick={scrollPrev}
@@ -88,7 +88,7 @@ const ReviewSlider = () => {
       >
         <ChevronLeft className="w-6 h-6 text-gray-700" />
       </button>
-      
+
       <button
         className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md -mr-6 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
         onClick={scrollNext}

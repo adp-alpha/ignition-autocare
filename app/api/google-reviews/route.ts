@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { GoogleReviewsService } from "@/lib/google-reviews";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Revalidate every hour
@@ -7,11 +7,11 @@ export const revalidate = 3600; // Revalidate every hour
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "6");
-    const onlyFiveStar = searchParams.get("fiveStarOnly") !== "false";
+    const limit = parseInt(searchParams.get("limit") || "30");
+    const onlyFiveStar = searchParams.get("fiveStarOnly") !== "true";
 
     const service = new GoogleReviewsService();
-    const reviews = onlyFiveStar 
+    const reviews = onlyFiveStar
       ? await service.getFiveStarReviews(limit)
       : await service.getAllReviews(limit);
 
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error in google-reviews API:", error);
-    
+
     return NextResponse.json(
       {
         success: false,

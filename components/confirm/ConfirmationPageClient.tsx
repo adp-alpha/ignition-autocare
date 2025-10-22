@@ -28,13 +28,15 @@ const ConfirmationPageClient = () => {
   // --- START: Date and Time Availability Logic ---
 
   const formatDateToString = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
   // State for available dates from API
-  const [availableDates, setAvailableDates] = useState<Map<string, AvailableSlot[]>>(new Map());
+  const [availableDates, setAvailableDates] = useState<
+    Map<string, AvailableSlot[]>
+  >(new Map());
   const [loadingSlots, setLoadingSlots] = useState(true);
   const [slotError, setSlotError] = useState<string | null>(null);
 
@@ -45,23 +47,25 @@ const ConfirmationPageClient = () => {
         setLoadingSlots(true);
         setSlotError(null);
 
-        const response = await fetch('/api/slots/available?days=60');
+        const response = await fetch("/api/slots/available?days=60");
         if (!response.ok) {
-          throw new Error('Failed to fetch available slots');
+          throw new Error("Failed to fetch available slots");
         }
 
         const data = await response.json();
 
         // Convert to Map for efficient lookup
         const datesMap = new Map<string, AvailableSlot[]>();
-        data.dates.forEach((dateData: { date: string; slots: AvailableSlot[] }) => {
-          datesMap.set(dateData.date, dateData.slots);
-        });
+        data.dates.forEach(
+          (dateData: { date: string; slots: AvailableSlot[] }) => {
+            datesMap.set(dateData.date, dateData.slots);
+          }
+        );
 
         setAvailableDates(datesMap);
       } catch (error) {
-        console.error('Error fetching available slots:', error);
-        setSlotError('Unable to load available slots. Please try again.');
+        console.error("Error fetching available slots:", error);
+        setSlotError("Unable to load available slots. Please try again.");
       } finally {
         setLoadingSlots(false);
       }
@@ -176,18 +180,25 @@ const ConfirmationPageClient = () => {
         customer: customerDetails,
         vehicle: {
           vrm: vehicleData.Results.VehicleDetails.VehicleIdentification.Vrm,
-          make: vehicleData.Results.VehicleDetails.VehicleIdentification.DvlaMake,
-          model: vehicleData.Results.VehicleDetails.VehicleIdentification.DvlaModel,
-          engineSize: vehicleData.Results.VehicleDetails.DvlaTechnicalDetails?.EngineCapacityCc
+          make: vehicleData.Results.VehicleDetails.VehicleIdentification
+            .DvlaMake,
+          model:
+            vehicleData.Results.VehicleDetails.VehicleIdentification.DvlaModel,
+          engineSize: vehicleData.Results.VehicleDetails.DvlaTechnicalDetails
+            ?.EngineCapacityCc
             ? `${vehicleData.Results.VehicleDetails.DvlaTechnicalDetails.EngineCapacityCc}cc`
-            : vehicleData.Results.ModelDetails?.Powertrain?.IceDetails?.EngineCapacityCc
+            : vehicleData.Results.ModelDetails?.Powertrain?.IceDetails
+                ?.EngineCapacityCc
             ? `${vehicleData.Results.ModelDetails.Powertrain.IceDetails.EngineCapacityCc}cc`
             : undefined,
-          fuelType: vehicleData.Results.ModelDetails?.Powertrain?.FuelType || undefined,
-          vehicleClass: vehicleData.Results.ModelDetails?.ModelClassification?.VehicleClass || undefined,
+          fuelType:
+            vehicleData.Results.ModelDetails?.Powertrain?.FuelType || undefined,
+          vehicleClass:
+            vehicleData.Results.ModelDetails?.ModelClassification
+              ?.VehicleClass || undefined,
         },
         slot: {
-          date:  formatDateToString(selectedDate!),
+          date: formatDateToString(selectedDate!),
           timeSlot: selectedSlot.displayTime,
           startTime: selectedSlot.startTime,
           endTime: selectedSlot.endTime,
@@ -201,10 +212,10 @@ const ConfirmationPageClient = () => {
       console.log(JSON.stringify(bookingRequest, null, 2));
 
       // Send to API
-      const response = await fetch('/api/bookings/create', {
-        method: 'POST',
+      const response = await fetch("/api/bookings/create", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(bookingRequest),
       });
@@ -212,7 +223,7 @@ const ConfirmationPageClient = () => {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Failed to create booking');
+        throw new Error(result.error || "Failed to create booking");
       }
 
       console.log("--- BOOKING CONFIRMED ---");
@@ -225,13 +236,16 @@ const ConfirmationPageClient = () => {
 
       // Optionally redirect to a success page or clear the form
       // window.location.href = `/booking-success?ref=${result.bookingReference}`;
-
     } catch (error) {
-      console.error('Error creating booking:', error);
+      console.error("Error creating booking:", error);
       setSubmitError(
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error ? error.message : "An unexpected error occurred"
       );
-      alert(`Booking Failed: ${error instanceof Error ? error.message : 'Please try again'}`);
+      alert(
+        `Booking Failed: ${
+          error instanceof Error ? error.message : "Please try again"
+        }`
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -243,7 +257,8 @@ const ConfirmationPageClient = () => {
         <div className="text-center">
           <p className="text-lg">Loading booking details...</p>
           <p className="text-sm text-gray-500 mt-2">
-            If you have landed here directly, please start a booking from the services page.
+            If you have landed here directly, please start a booking from the
+            services page.
           </p>
         </div>
       </div>
@@ -307,31 +322,45 @@ const ConfirmationPageClient = () => {
                   })}
                   .
                 </p>
-                <div className="grid grid-cols-1 gap-8">
-                  <div className="w-full flex gap-4">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      disabled={(date: Date) => {
-                        const yesterday = new Date();
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        if (date < yesterday) return true;
+                <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8">
+                  {/* Calendar Section */}
+                  <div className="w-full">
+                    <Label className="text-base font-medium mb-3 block">
+                      Select a date
+                    </Label>
+                    <div className="flex justify-center lg:justify-start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        disabled={(date: Date) => {
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          if (date < yesterday) return true;
 
-                        const dateString = date.toISOString().split("T")[0];
-                        return !availableDates.has(dateString);
-                      }}
-                      className="rounded-md border w-[60%]"
-                    />
+                          const dateString = date.toISOString().split("T")[0];
+                          return !availableDates.has(dateString);
+                        }}
+                        className="rounded-md border w-full max-w-sm lg:max-w-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Time Slots Section */}
+                  <div className="w-full">
                     {selectedDate && availableTimeSlots.length > 0 && (
-                      <div>
-                        <Label>Choose an available time slot</Label>
+                      <>
+                        <Label className="text-base font-medium mb-3 block">
+                          Choose an available time slot
+                        </Label>
                         <ToggleGroup
                           type="single"
-                          className="mt-2 w-full grid grid-cols-2 gap-2"
+                          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-2 gap-3 w-full"
                           value={selectedSlot?.id}
                           onValueChange={(value: string) => {
-                            const slot = availableTimeSlots.find(s => s.id === value);
+                            const slot = availableTimeSlots.find(
+                              (s) => s.id === value
+                            );
                             setSelectedSlot(slot);
                           }}
                         >
@@ -341,22 +370,42 @@ const ConfirmationPageClient = () => {
                               value={slot.id}
                               aria-label={`Toggle ${slot.displayTime}`}
                               disabled={slot.availableCapacity === 0}
-                              className="w-full"
+                              className="w-full text-sm py-3 px-4 min-h-[44px] justify-center"
                             >
                               {slot.displayTime}
                             </ToggleGroupItem>
                           ))}
                         </ToggleGroup>
-                        <p className="text-sm text-gray-500 mt-2">
+                        <p className="text-sm text-gray-500 mt-3">
                           Garages will confirm the exact time within your chosen
                           slot.
                         </p>
+                      </>
+                    )}
+
+                    {selectedDate && availableTimeSlots.length === 0 && (
+                      <div className="text-gray-500 text-center lg:text-left">
+                        <Label className="text-base font-medium mb-3 block">
+                          Time slots
+                        </Label>
+                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                          <p>No available slots for this date.</p>
+                          <p className="text-sm">Please select another date.</p>
+                        </div>
                       </div>
                     )}
-                    {selectedDate && availableTimeSlots.length === 0 && (
-                      <div className="text-gray-500">
-                        <p>No available slots for this date.</p>
-                        <p className="text-sm">Please select another date.</p>
+
+                    {!selectedDate && (
+                      <div className="text-gray-400">
+                        <Label className="text-base font-medium mb-3 block">
+                          Time slots
+                        </Label>
+                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                          <p>
+                            Please select a date first to see available time
+                            slots.
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -366,7 +415,9 @@ const ConfirmationPageClient = () => {
 
             {!loadingSlots && !slotError && availableDates.size === 0 && (
               <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg">
-                <p>No available slots found. Please contact the garage directly.</p>
+                <p>
+                  No available slots found. Please contact the garage directly.
+                </p>
               </div>
             )}
           </div>
