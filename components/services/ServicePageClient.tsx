@@ -14,11 +14,78 @@ import { MotHistoryData, VehicleData } from "@/types/vehicleData";
 import { Check, Dot } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { lazy, memo, Suspense, useEffect, useState } from "react";
-import { CalendarIcon, CustomCheckbox, InfoIcon, LocationIcon, renderStars, StarIcon } from './component';
+import {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  CalendarIcon,
+  CustomCheckbox,
+  InfoIcon,
+  LocationIcon,
+  renderStars,
+  StarIcon,
+} from "./component";
 
 // Lazy load heavy components
 const ReviewSlider = lazy(() => import("@/components/reviews/ReviewSlider"));
+
+// Memoized Vehicle Info Component
+const VehicleInfo = memo(
+  ({
+    vehicleData,
+    motHistoryData,
+  }: {
+    vehicleData: VehicleData;
+    motHistoryData: MotHistoryData | null;
+  }) => {
+    const vehicleDetails = vehicleData.Results?.VehicleDetails;
+    const modelDetails = vehicleData.Results?.ModelDetails;
+
+    if (!vehicleDetails) {
+      return <span>Loading vehicle details...</span>;
+    }
+
+    return (
+      <>
+        <span>
+          {vehicleDetails.VehicleIdentification.DvlaMake}{" "}
+          {vehicleDetails.VehicleIdentification.DvlaModel}{" "}
+          {modelDetails?.Powertrain.IceDetails?.EngineCapacityCc}cc
+        </span>
+        <br />
+        <span className="text-[#0a65a3] text-xl">
+          {vehicleDetails.VehicleIdentification.Vrm}
+        </span>
+        <br />
+        <span>
+          {vehicleDetails.VehicleIdentification.DvlaFuelType}{" "}
+          {modelDetails?.Powertrain.Transmission.TransmissionType}
+        </span>
+        <div>
+          MOT due on:{" "}
+          {motHistoryData?.Results?.MotHistoryDetails?.MotDueDate
+            ? new Date(
+                motHistoryData.Results.MotHistoryDetails.MotDueDate
+              ).toLocaleDateString()
+            : "N/A"}
+        </div>
+        <span>
+          Registered on:{" "}
+          {new Date(
+            vehicleDetails.VehicleIdentification.DateFirstRegistered ?? ""
+          ).toLocaleDateString()}
+        </span>
+      </>
+    );
+  }
+);
+VehicleInfo.displayName = "VehicleInfo";
 
 interface ServicePageClientProps {
   vehicleData: VehicleData | null;
@@ -27,150 +94,151 @@ interface ServicePageClientProps {
   registration: string;
 }
 
-
 // Memoized Service Accordion Section
-const ServiceAccordionSection = memo(({
-  title,
-  sectionKey,
-  services,
-  isOpen,
-  toggleSection,
-  selectedServices,
-  handleServiceSelection,
-  displayPrices,
-}: {
-  title: string;
-  sectionKey: string;
-  services: ServiceItem[];
-  isOpen: boolean;
-  toggleSection: (section: string) => void;
-  selectedServices: string[];
-  handleServiceSelection: (id: string) => void;
-  displayPrices: FormattedPricingData;
-}) => {
-  const uiDetails = serviceUIText;
+const ServiceAccordionSection = memo(
+  ({
+    title,
+    sectionKey,
+    services,
+    isOpen,
+    toggleSection,
+    selectedServices,
+    handleServiceSelection,
+    displayPrices,
+  }: {
+    title: string;
+    sectionKey: string;
+    services: ServiceItem[];
+    isOpen: boolean;
+    toggleSection: (section: string) => void;
+    selectedServices: string[];
+    handleServiceSelection: (id: string) => void;
+    displayPrices: FormattedPricingData;
+  }) => {
+    const uiDetails = serviceUIText;
 
-  return (
-    <div className="bg-white border-t border-gray-200">
-      <h2
-        className="cursor-pointer relative text-xl font-bold p-4 w-full"
-        onClick={() => toggleSection(sectionKey)}
-      >
-        {title}
-        <svg
-          aria-hidden="true"
-          className={`w-4 h-4 absolute right-5 top-5 transform transition-transform ${
-            isOpen ? "" : "rotate-180"
-          }`}
-          role="img"
-          viewBox="0 0 512 512"
+    return (
+      <div className="bg-white border-t border-gray-200">
+        <h2
+          className="cursor-pointer relative text-xl font-bold p-4 w-full"
+          onClick={() => toggleSection(sectionKey)}
         >
-          <path
-            fill="currentColor"
-            d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"
-          ></path>
-        </svg>
-      </h2>
-      {isOpen && (
-        <div className="pb-0">
-          {services.map((service) => {
-            const details: ServiceUIDetails = uiDetails[service.id] || {};
-            const isChecked = selectedServices.includes(service.id);
+          {title}
+          <svg
+            aria-hidden="true"
+            className={`w-4 h-4 absolute right-5 top-5 transform transition-transform ${
+              isOpen ? "" : "rotate-180"
+            }`}
+            role="img"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="currentColor"
+              d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"
+            ></path>
+          </svg>
+        </h2>
+        {isOpen && (
+          <div className="pb-0">
+            {services.map((service) => {
+              const details: ServiceUIDetails = uiDetails[service.id] || {};
+              const isChecked = selectedServices.includes(service.id);
 
-            return (
-              <div
-                key={service.id}
-                className="flex items-center justify-between cursor-pointer py-3 px-4 border-b last:border-b-0"
-                onClick={() => handleServiceSelection(service.id)}
-              >
-                <div className="flex items-start">
-                  <div className="mr-4 pt-0.5">
-                    <CustomCheckbox checked={isChecked} />
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center">
-                      <h3 className="text-base font-bold text-brand-dark-blue">
-                        {service.name}
-                      </h3>
-                      {details.hasIcon && <InfoIcon />}
+              return (
+                <div
+                  key={service.id}
+                  className="flex items-center justify-between cursor-pointer py-3 px-4 border-b last:border-b-0"
+                  onClick={() => handleServiceSelection(service.id)}
+                >
+                  <div className="flex items-start">
+                    <div className="mr-4 pt-0.5">
+                      <CustomCheckbox checked={isChecked} />
                     </div>
-                    {details.description && (
-                      <p className="text-sm text-brand-gray font-normal mt-1">
-                        {details.description}
-                      </p>
-                    )}
-                    {details.subtitle && (
-                      <p className="text-sm text-brand-gray font-normal mt-1">
-                        {details.subtitle}
-                      </p>
+                    <div className="flex flex-col">
+                      <div className="flex items-center">
+                        <h3 className="text-base font-bold text-brand-dark-blue">
+                          {service.name}
+                        </h3>
+                        {details.hasIcon && <InfoIcon />}
+                      </div>
+                      {details.description && (
+                        <p className="text-sm text-brand-gray font-normal mt-1">
+                          {details.description}
+                        </p>
+                      )}
+                      {details.subtitle && (
+                        <p className="text-sm text-brand-gray font-normal mt-1">
+                          {details.subtitle}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right flex items-center justify-end gap-2 pl-2">
+                    {service.priceType === "REVEAL" ? (
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-brand-green text-white text-sm font-bold py-2 px-4 rounded-md"
+                      >
+                        Reveal Price
+                      </button>
+                    ) : service.priceType === "ESTIMATE" ? (
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-gray-200 text-brand-dark-blue text-sm font-bold py-2 px-4 rounded-md"
+                      >
+                        Get an estimate
+                      </button>
+                    ) : (
+                      <div className="flex flex-col items-end">
+                        <span className="text-lg font-semibold text-black">
+                          £{service.finalPrice?.toFixed(2)}
+                        </span>
+                        {service.id === "mot" && !service.discount ? (
+                          <div className="text-xs text-right text-brand-gray font-normal mt-1">
+                            {service.discounts
+                              .filter(
+                                (d) =>
+                                  d.condition === "WITH_FULL_SERVICE" ||
+                                  d.condition === "WITH_MAJOR_SERVICE"
+                              )
+                              .map((discount) => (
+                                <div key={discount.condition}>
+                                  Only £{discount.discountedPrice.toFixed(2)}{" "}
+                                  with a{" "}
+                                  {
+                                    displayPrices?.motAndServicing.find(
+                                      (s) =>
+                                        s.id.toLowerCase() ===
+                                        discount.condition
+                                          .replace("WITH_", "")
+                                          .replace("_SERVICE", "Service")
+                                          .toLowerCase()
+                                    )?.name
+                                  }
+                                </div>
+                              ))}
+                          </div>
+                        ) : null}
+                        {service.originalPrice &&
+                        service.discount &&
+                        service.discount > 0 ? (
+                          <div className="text-sm text-red-500 font-bold mt-1">
+                            Discounted by {service.discount}%! (from £
+                            {service.originalPrice.toFixed(2)})
+                          </div>
+                        ) : null}
+                      </div>
                     )}
                   </div>
                 </div>
-                <div className="text-right flex items-center justify-end gap-2 pl-2">
-                  {service.priceType === "REVEAL" ? (
-                    <button
-                      onClick={(e) => e.stopPropagation()}
-                      className="bg-brand-green text-white text-sm font-bold py-2 px-4 rounded-md"
-                    >
-                      Reveal Price
-                    </button>
-                  ) : service.priceType === "ESTIMATE" ? (
-                    <button
-                      onClick={(e) => e.stopPropagation()}
-                      className="bg-gray-200 text-brand-dark-blue text-sm font-bold py-2 px-4 rounded-md"
-                    >
-                      Get an estimate
-                    </button>
-                  ) : (
-                    <div className="flex flex-col items-end">
-                      <span className="text-lg font-semibold text-black">
-                        £{service.finalPrice?.toFixed(2)}
-                      </span>
-                      {service.id === "mot" && !service.discount ? (
-                        <div className="text-xs text-right text-brand-gray font-normal mt-1">
-                          {service.discounts
-                            .filter(
-                              (d) =>
-                                d.condition === "WITH_FULL_SERVICE" ||
-                                d.condition === "WITH_MAJOR_SERVICE"
-                            )
-                            .map((discount) => (
-                              <div key={discount.condition}>
-                                Only £{discount.discountedPrice.toFixed(2)} with
-                                a{" "}
-                                {
-                                  displayPrices?.motAndServicing.find(
-                                    (s) =>
-                                      s.id.toLowerCase() ===
-                                      discount.condition
-                                        .replace("WITH_", "")
-                                        .replace("_SERVICE", "Service")
-                                        .toLowerCase()
-                                  )?.name
-                                }
-                              </div>
-                            ))}
-                        </div>
-                      ) : null}
-                      {service.originalPrice &&
-                      service.discount &&
-                      service.discount > 0 ? (
-                        <div className="text-sm text-red-500 font-bold mt-1">
-                          Discounted by {service.discount}%! (from £
-                          {service.originalPrice.toFixed(2)})
-                        </div>
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-});
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
 ServiceAccordionSection.displayName = "ServiceAccordionSection";
 
 const ServicePageClient = ({
@@ -195,25 +263,67 @@ const ServicePageClient = ({
     motHistoryData: contextMotHistoryData,
   } = useBooking();
 
+  // Initialize data immediately when component mounts
   useEffect(() => {
-    setInitialData({ vehicleData, motHistoryData, pricingData });
-    setRegistration(registration);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (vehicleData && pricingData) {
+      setInitialData({ vehicleData, motHistoryData, pricingData });
+      setRegistration(registration);
+    }
+  }, [
+    vehicleData,
+    motHistoryData,
+    pricingData,
+    registration,
+    setInitialData,
+    setRegistration,
+  ]);
 
-  const toggleSection = (section: string) => {
+  const toggleSection = useCallback((section: string) => {
     setOpenSections((prevOpenSections) =>
       prevOpenSections.includes(section)
         ? prevOpenSections.filter((s) => s !== section)
         : [...prevOpenSections, section]
     );
-  };
+  }, []);
 
-  function handleBooking() {
+  const handleBooking = useCallback(() => {
     router.push("/confirm");
-  }
+  }, [router]);
 
-  if (!displayPrices || !contextVehicleData) {
+  // Show vehicle info immediately from props while context loads
+  const currentVehicleData = contextVehicleData || vehicleData;
+  const currentMotHistoryData = contextMotHistoryData || motHistoryData;
+  const currentDisplayPrices = displayPrices || pricingData;
+
+  // Memoize service sections to prevent unnecessary re-renders
+  const serviceSections = useMemo(() => {
+    if (!currentDisplayPrices) return null;
+
+    return [
+      {
+        title: "MOT & Servicing",
+        key: "mot_and_servicing",
+        services: currentDisplayPrices.motAndServicing,
+      },
+      {
+        title: "Additional Work",
+        key: "additional_work",
+        services: currentDisplayPrices.additionalWork,
+      },
+      {
+        title: "Repairs",
+        key: "repairs",
+        services: currentDisplayPrices.repairs,
+      },
+      {
+        title: "Addons",
+        key: "addons",
+        services: currentDisplayPrices.addons,
+      },
+    ];
+  }, [currentDisplayPrices]);
+
+  if (!currentVehicleData) {
     return <div>Loading services...</div>;
   }
 
@@ -243,19 +353,26 @@ const ServicePageClient = ({
               MOT-7 Vehicles are not supported
             </h1>
 
-            {contextVehicleData?.Results?.VehicleDetails && (
+            {currentVehicleData?.Results?.VehicleDetails && (
               <div className="mb-4">
                 <p className="text-base text-gray-700">
-                  {contextVehicleData.Results.VehicleDetails.VehicleIdentification.DvlaMake}{" "}
-                  {contextVehicleData.Results.VehicleDetails.VehicleIdentification.DvlaModel}
+                  {
+                    currentVehicleData.Results.VehicleDetails
+                      .VehicleIdentification.DvlaMake
+                  }{" "}
+                  {
+                    currentVehicleData.Results.VehicleDetails
+                      .VehicleIdentification.DvlaModel
+                  }
                 </p>
               </div>
             )}
 
             <div className="mb-6 p-4 rounded-lg bg-red-100">
               <p className="text-sm text-red-700">
-                We currently do not support MOT Class 7 vehicles (vehicles over 3,000kg).
-                Our service is designed for standard cars and light commercial vehicles only.
+                We currently do not support MOT Class 7 vehicles (vehicles over
+                3,000kg). Our service is designed for standard cars and light
+                commercial vehicles only.
               </p>
             </div>
 
@@ -270,7 +387,7 @@ const ServicePageClient = ({
 
             <div className="flex gap-4">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push("/")}
                 className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 font-semibold transition-colors"
               >
                 ← Back to Home
@@ -444,61 +561,10 @@ const ServicePageClient = ({
           {/* RIGHT COLUMN - Shows second on mobile, right column on desktop */}
           <div className="bg-white border border-gray-200 rounded-lg lg:col-start-2 lg:row-start-1 lg:row-span-4">
             <div className="p-4">
-              {contextVehicleData?.Results?.VehicleDetails ? (
-                <>
-                  <span>
-                    {
-                      contextVehicleData.Results.VehicleDetails
-                        .VehicleIdentification.DvlaMake
-                    }{" "}
-                    {
-                      contextVehicleData.Results.VehicleDetails
-                        .VehicleIdentification.DvlaModel
-                    }{" "}
-                    {
-                      contextVehicleData.Results.ModelDetails?.Powertrain
-                        .IceDetails?.EngineCapacityCc
-                    }
-                    cc
-                  </span>
-                  <br />
-                  <span className="text-[#0a65a3] text-xl">
-                    {
-                      contextVehicleData.Results.VehicleDetails
-                        .VehicleIdentification.Vrm
-                    }
-                  </span>
-                  <br />
-                  <span>
-                    {
-                      contextVehicleData.Results.VehicleDetails
-                        .VehicleIdentification.DvlaFuelType
-                    }{" "}
-                    {
-                      contextVehicleData.Results.ModelDetails?.Powertrain
-                        .Transmission.TransmissionType
-                    }
-                  </span>
-                  <div>
-                    MOT due on:{" "}
-                    {contextMotHistoryData?.Results?.MotHistoryDetails
-                      ?.MotDueDate
-                      ? new Date(
-                          contextMotHistoryData.Results.MotHistoryDetails.MotDueDate
-                        ).toLocaleDateString()
-                      : "N/A"}
-                  </div>
-                  <span>
-                    Registered on:{" "}
-                    {new Date(
-                      contextVehicleData.Results.VehicleDetails
-                        .VehicleIdentification.DateFirstRegistered ?? ""
-                    ).toLocaleDateString()}
-                  </span>
-                </>
-              ) : (
-                <span>Loading vehicle details...</span>
-              )}
+              <VehicleInfo
+                vehicleData={currentVehicleData}
+                motHistoryData={currentMotHistoryData}
+              />
               <button
                 type="button"
                 className="w-full mt-1.5 bg-brand-green text-white py-2 rounded font-bold cursor-pointer"
@@ -510,46 +576,19 @@ const ServicePageClient = ({
 
             {/* Service Selection UI */}
             <div className="border-t border-gray-200">
-              <ServiceAccordionSection
-                title="MOT & Servicing"
-                sectionKey="mot_and_servicing"
-                services={displayPrices.motAndServicing}
-                isOpen={openSections.includes("mot_and_servicing")}
-                toggleSection={toggleSection}
-                selectedServices={selectedServices}
-                handleServiceSelection={handleServiceSelection}
-                displayPrices={displayPrices}
-              />
-              <ServiceAccordionSection
-                title="Additional Work"
-                sectionKey="additional_work"
-                services={displayPrices.additionalWork}
-                isOpen={openSections.includes("additional_work")}
-                toggleSection={toggleSection}
-                selectedServices={selectedServices}
-                handleServiceSelection={handleServiceSelection}
-                displayPrices={displayPrices}
-              />
-              <ServiceAccordionSection
-                title="Repairs"
-                sectionKey="repairs"
-                services={displayPrices.repairs}
-                isOpen={openSections.includes("repairs")}
-                toggleSection={toggleSection}
-                selectedServices={selectedServices}
-                handleServiceSelection={handleServiceSelection}
-                displayPrices={displayPrices}
-              />
-              <ServiceAccordionSection
-                title="Addons"
-                sectionKey="addons"
-                services={displayPrices.addons}
-                isOpen={openSections.includes("addons")}
-                toggleSection={toggleSection}
-                selectedServices={selectedServices}
-                handleServiceSelection={handleServiceSelection}
-                displayPrices={displayPrices}
-              />
+              {serviceSections?.map((section) => (
+                <ServiceAccordionSection
+                  key={section.key}
+                  title={section.title}
+                  sectionKey={section.key}
+                  services={section.services}
+                  isOpen={openSections.includes(section.key)}
+                  toggleSection={toggleSection}
+                  selectedServices={selectedServices}
+                  handleServiceSelection={handleServiceSelection}
+                  displayPrices={currentDisplayPrices}
+                />
+              ))}
             </div>
 
             <div className="p-4 flex w-full border-t">
@@ -735,7 +774,13 @@ const ServicePageClient = ({
 
             {/* Lazy load reviews slider */}
             <div className="my-8">
-              <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
+              <Suspense
+                fallback={
+                  <div className="h-64 bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
+                    <div className="text-gray-500">Loading reviews...</div>
+                  </div>
+                }
+              >
                 <ReviewSlider />
               </Suspense>
             </div>

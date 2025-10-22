@@ -52,10 +52,17 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
 
   // Function to load initial data on the service page
   const setInitialData = (data: InitialData) => {
-    setVehicleData(data.vehicleData);
-    setMotHistoryData(data.motHistoryData);
-    setPricingData(data.pricingData);
-    setDisplayPrices(data.pricingData); // Set initial display prices
+    // Only update if data has actually changed to prevent unnecessary re-renders
+    if (data.vehicleData !== vehicleData) {
+      setVehicleData(data.vehicleData);
+    }
+    if (data.motHistoryData !== motHistoryData) {
+      setMotHistoryData(data.motHistoryData);
+    }
+    if (data.pricingData !== pricingData) {
+      setPricingData(data.pricingData);
+      setDisplayPrices(data.pricingData); // Set initial display prices
+    }
   };
 
   console.log(isVan, 'isVan');
