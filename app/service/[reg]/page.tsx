@@ -16,7 +16,6 @@ const ServicePage = () => {
   const [adminData, setAdminData] = useState<AdminData | null>(null);
   const [loadingStates, setLoadingStates] = useState({
     vehicle: true,
-    mot: true,
     admin: true,
   });
   const [error, setError] = useState<string | null>(null);
@@ -50,111 +49,90 @@ const ServicePage = () => {
       }
     };
 
-    // Fetch admin data first (usually fastest and needed for pricing)
-    const fetchAdminData = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch('/api/admin-data', {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
+        // Start all fetches in parallel immediately
+        const startTime = performance.now();
 
-        if (!response.ok) {
-          throw new Error(`Admin data fetch failed: ${response.status}`);
+        const [adminResponse, vehicleResponse] = await Promise.all([
+          fetch('/api/admin-data', {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }),
+          fetch(`/api/vehicle-lookup?reg=${encodeURIComponent(reg)}&type=both`, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+          })
+        ]);
+
+        const endTime = performance.now();
+        console.log(`✓ All API calls completed in ${Math.round(endTime - startTime)}ms`);
+
+        // Handle admin data
+        if (!adminResponse.ok) {
+          throw new Error(`Admin data fetch failed: ${adminResponse.status}`);
         }
-
-        const data = await safeJsonParse(response, 'Admin Data');
-        setAdminData(data);
+        const adminResult = await safeJsonParse(adminResponse, 'Admin Data');
+        setAdminData(adminResult);
         setLoadingStates(prev => ({ ...prev, admin: false }));
-      } catch (err) {
-        console.error('Admin data error:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load pricing data');
-        setLoadingStates(prev => ({ ...prev, admin: false }));
-      }
-    };
 
-    // Fetch vehicle data (critical for display)
-    const fetchVehicleData = async () => {
-      try {
-        const response = await fetch(`/api/vehicle-lookup?reg=${encodeURIComponent(reg)}`, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          const data = await safeJsonParse(response, 'Vehicle Data');
-          if (response.status === 404) {
-            throw new Error(data.message || 'Invalid registration number. Please check and try again.');
+        // Handle vehicle + MOT data
+        if (!vehicleResponse.ok) {
+          const errorData = await safeJsonParse(vehicleResponse, 'Vehicle Data');
+          if (vehicleResponse.status === 404) {
+            throw new Error(errorData.message || 'Invalid registration number. Please check and try again.');
           }
-          throw new Error(data.error || `Failed to fetch vehicle data: ${response.statusText}`);
+          throw new Error(errorData.error || `Failed to fetch vehicle data: ${vehicleResponse.statusText}`);
         }
 
-        const data = await safeJsonParse(response, 'Vehicle Data');
+        const vehicleResult = await safeJsonParse(vehicleResponse, 'Vehicle Data');
 
-        // Validate response
-        if (!data?.ResponseInformation?.IsSuccessStatusCode) {
-          const statusMessage = data?.ResponseInformation?.StatusMessage || 'Unknown error';
+        // Extract vehicle data
+        const vehicle = vehicleResult.vehicle;
+        const mot = vehicleResult.mot;
+
+        // Validate vehicle data
+        if (!vehicle?.ResponseInformation?.IsSuccessStatusCode) {
+          const statusMessage = vehicle?.ResponseInformation?.StatusMessage || 'Unknown error';
           if (statusMessage === 'InvalidSearchTerm') {
             throw new Error('Invalid registration number format. Please enter a valid UK registration.');
           }
           throw new Error(`Vehicle lookup failed: ${statusMessage}`);
         }
 
-        if (!data.Results || Object.keys(data.Results).length === 0) {
+        if (!vehicle.Results || Object.keys(vehicle.Results).length === 0) {
           throw new Error('No vehicle data found for this registration number');
         }
 
-        const engineCapacity = data.Results?.ModelDetails?.Powertrain?.IceDetails?.EngineCapacityCc;
+        const engineCapacity = vehicle.Results?.ModelDetails?.Powertrain?.IceDetails?.EngineCapacityCc;
         if (!engineCapacity) {
           throw new Error('Unable to retrieve engine capacity for this vehicle. This service may not be available for this vehicle type.');
         }
 
-        setVehicleData(data);
+        // Set vehicle data
+        setVehicleData(vehicle);
         setLoadingStates(prev => ({ ...prev, vehicle: false }));
-      } catch (err) {
-        console.error('Vehicle data error:', err);
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        setLoadingStates(prev => ({ ...prev, vehicle: false }));
-      }
-    };
 
-    // Fetch MOT data (can load after initial render)
-    const fetchMotData = async () => {
-      try {
-        const response = await fetch(`/api/vehicle-lookup?reg=${encodeURIComponent(reg)}&type=mot`, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          console.warn('MOT data not available');
-          setLoadingStates(prev => ({ ...prev, mot: false }));
-          return;
+        // Set MOT data if available
+        if (mot?.ResponseInformation?.IsSuccessStatusCode) {
+          setMotHistory(mot);
+          console.log('✓ MOT history loaded successfully');
+        } else {
+          console.log('⚠ MOT history not available');
         }
 
-        const data = await safeJsonParse(response, 'MOT Data');
-        setMotHistory(data);
-        setLoadingStates(prev => ({ ...prev, mot: false }));
       } catch (err) {
-        console.error('MOT data error:', err);
-        // MOT data is optional - don't show error
-        setLoadingStates(prev => ({ ...prev, mot: false }));
+        console.error('Data fetch error:', err);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setLoadingStates({ vehicle: false, admin: false });
       }
     };
 
-    // Start all fetches in parallel
-    fetchAdminData();
-    fetchVehicleData();
-
-    // Delay MOT fetch slightly to prioritize critical data
-    const motTimeout = setTimeout(fetchMotData, 100);
-
-    return () => clearTimeout(motTimeout);
+    fetchAllData();
   }, [reg]);
 
   // Show loading only for critical data (vehicle + admin)

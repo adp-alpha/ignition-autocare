@@ -115,6 +115,10 @@ ${booking.notes ? `NOTES:\n${booking.notes}` : ''}
           { method: 'email', minutes: 24 * 60 }, // 1 day before
           { method: 'popup', minutes: 60 }, // 1 hour before
         ],
+        // mail to the customer as well
+        attendees: [
+          { email: customer.email },
+        ],
       },
       colorId: '5', // Yellow color for bookings
     };
