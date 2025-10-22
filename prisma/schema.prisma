@@ -1,0 +1,200 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminData {
+  id                  String   @id @default(cuid())
+  defaultLeadTime     Int      @default(0)
+  
+  // MOT Configuration (stored as JSON for complex nested structure)
+  motClass4           Json
+  motClass7           Json
+  
+  // Delivery Options (array of complex objects)
+  deliveryOptions     Json
+  
+  // Products (arrays of complex objects)
+  customProducts      Json
+  singlePriceProducts Json
+  products            Json
+  
+  // Vehicle Safety Check
+  vehicleSafetyCheck  Json
+  
+  // Service Pricing (complex nested structure)
+  servicePricing      Json
+  
+  // Servicing Rates
+  servicingRates      Json
+  
+  // Offers (array)
+  offers              Json
+  
+  // Common Repairs
+  commonRepairs       Json
+  
+  // Offers and Extras
+  offersAndExtras     Json
+  
+  // Metadata
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@map("admin_data")
+}
+
+// ==================== BOOKING SYSTEM MODELS ====================
+
+model Customer {
+  id            String    @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String
+  contactNumber String
+  
+  // Relations
+  bookings      Booking[]
+  
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("customers")
+  @@index([email])
+}
+
+model Booking {
+  id                    String          @id @default(cuid())
+  bookingReference      String          @unique // e.g., "IGN-20251012-001"
+  
+  // Customer Information
+  customerId            String
+  customer              Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  // Vehicle Information
+  vrm                   String
+  make                  String
+  model                 String
+  engineSize            String?
+  fuelType              String?
+  vehicleClass          String?         // e.g., "Class 4", "Class 7"
+  
+  // Booking Date & Time (stored directly instead of referencing slot)
+  bookingDate           DateTime        @db.Date
+  startTime             String          // e.g., "09:00"
+  endTime               String          // e.g., "11:00"
+  displayTime           String          // e.g., "09:00 - 11:00"
+  
+  // Services Selected (as JSON for flexibility)
+  servicesData          Json            // Structured service data
+  
+  // Pricing
+  totalPrice            Decimal         @db.Decimal(10, 2)
+  isBlueLightCardHolder Boolean         @default(false)
+  
+  // Additional Information
+  notes                 String?         @db.Text
+  
+  // Status Management
+  status                BookingStatus   @default(PENDING)
+  
+  // Google Calendar Integration
+  googleCalendarEventId String?         @unique
+  
+  // Metadata
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  
+  @@map("bookings")
+  @@index([customerId])
+  @@index([bookingDate, startTime, endTime])
+  @@index([bookingReference])
+  @@index([status])
+}
+
+model UnavailableSlot {
+  id          String      @id @default(cuid())
+  
+  // Date and Time
+  date        DateTime    @db.Date
+  startTime   String      // e.g., "09:00"
+  endTime     String      // e.g., "11:00"
+  
+  // Reason for unavailability
+  reason      String?     // e.g., "Maintenance", "Fully Booked", "Emergency Closure"
+  
+  // Metadata
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@map("unavailable_slots")
+  @@unique([date, startTime, endTime])
+  @@index([date])
+}
+
+model ClosedDay {
+  id          String      @id @default(cuid())
+  
+  // Date Information
+  date        DateTime    @db.Date
+  reason      String?     // e.g., "Public Holiday", "Annual Leave", "Maintenance"
+  isRecurring Boolean     @default(false) // e.g., for "Every Sunday"
+  
+  // For recurring closures (optional)
+  dayOfWeek   Int?        // 0 = Sunday, 6 = Saturday
+  
+  // Metadata
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@map("closed_days")
+  @@unique([date])
+  @@index([date])
+}
+
+model SlotConfiguration {
+  id                  String    @id @default(cuid())
+  
+  // Slot Configuration
+  slotDurationMinutes Int       @default(120) // 2 hours default
+  slotStartTime       String    @default("08:00")
+  slotEndTime         String    @default("17:00")
+  
+  // Day Preferences (stored as JSON array of day numbers: 0-6)
+  workingDays         Json      @default("[1,2,3,4,5]") // Mon-Fri by default
+  
+  // Capacity per slot (how many bookings can be made for the same time slot)
+  slotsPerTimeSlot    Int       @default(1)
+  
+  // Lead Time (minimum days in advance for booking)
+  minLeadTimeDays     Int       @default(1)
+  
+  // Maximum booking window (days in future)
+  maxBookingDays      Int       @default(60)
+  
+  // Active Configuration
+  isActive            Boolean   @default(true)
+  
+  // Metadata
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@map("slot_configurations")
+}
+
+enum BookingStatus {
+  PENDING           // Initial status
+  CONFIRMED         // Booking confirmed
+  IN_PROGRESS       // Work started
+  COMPLETED         // Service completed
+  CANCELLED         // Cancelled by customer or garage
+  NO_SHOW           // Customer didn't show up
+}

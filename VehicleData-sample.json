@@ -1,0 +1,251 @@
+{
+    "RequestInformation": {
+        "PackageName": "VehicleDetails",
+        "SearchTerm": "SJ22WKA",
+        "SearchType": "VRM",
+        "RequestIp": "152.56.245.170"
+    },
+    "ResponseInformation": {
+        "StatusCode": 0,
+        "StatusMessage": "Success",
+        "IsSuccessStatusCode": true,
+        "QueryTimeMs": 9,
+        "ResponseId": "0199b7a1-0fc7-7773-aece-728bf7d88865"
+    },
+    "BillingInformation": {
+        "BillingTransactionId": null,
+        "AccountType": 0,
+        "AccountBalance": null,
+        "TransactionCost": null,
+        "BillingResult": 0,
+        "BillingResultMessage": "Success",
+        "RefundAmount": null,
+        "RefundResult": null,
+        "RefundResultMessage": null
+    },
+    "Results": {
+        "VehicleDetails": {
+            "UkvdId": "V-BBBLZT",
+            "VehicleIdentification": {
+                "Vrm": "SJ22WKA",
+                "Vin": "Permission Required",
+                "VinLast5": "58336",
+                "DvlaMake": "PEUGEOT",
+                "DvlaModel": "5008 ACTIVE PREMIUM BLUEHDI SS",
+                "DvlaWheelPlan": "2 AXLE RIGID BODY",
+                "DateFirstRegisteredInUk": "2022-05-05T00:00:00Z",
+                "DateFirstRegistered": "2022-05-05T00:00:00Z",
+                "DateOfManufacture": "2022-05-05T00:00:00Z",
+                "YearOfManufacture": 2022,
+                "VehicleUsedBeforeFirstRegistration": false,
+                "EngineNumber": "Q4EL0027305",
+                "PreviousVrmNi": "",
+                "DvlaBodyType": "MPV",
+                "DvlaFuelType": "HEAVY OIL"
+            },
+            "VehicleStatus": {
+                "IsImported": false,
+                "IsImportedFromNi": false,
+                "IsImportedFromOutsideEu": false,
+                "DateImported": null,
+                "CertificateOfDestructionIssued": false,
+                "IsExported": false,
+                "DateExported": null,
+                "IsScrapped": false,
+                "IsUnscrapped": false,
+                "DateScrapped": null,
+                "DvlaCherishedTransferMarker": false,
+                "VehicleExciseDutyDetails": {
+                    "DvlaCo2": 133,
+                    "DvlaCo2Band": null,
+                    "DvlaBand": null,
+                    "VedRate": {
+                        "FirstYear": {
+                            "SixMonths": null,
+                            "TwelveMonths": 1360
+                        },
+                        "PremiumVehicle": {
+                            "SixMonths": 341,
+                            "TwelveMonths": 620
+                        },
+                        "Standard": {
+                            "SixMonths": 107.25,
+                            "TwelveMonths": 195
+                        }
+                    }
+                }
+            },
+            "VehicleHistory": {
+                "ColourDetails": {
+                    "CurrentColour": "GREY",
+                    "NumberOfColourChanges": 0,
+                    "OriginalColour": "GREY",
+                    "PreviousColour": null,
+                    "LatestColourChangeDate": null
+                },
+                "KeeperChangeList": [],
+                "PlateChangeList": [],
+                "V5cCertificateList": [
+                    {
+                        "IssueDate": "2022-05-05T00:00:00Z"
+                    }
+                ]
+            },
+            "DvlaTechnicalDetails": {
+                "NumberOfSeats": 7,
+                "EngineCapacityCc": 1500,
+                "GrossWeightKg": null,
+                "MaxNetPowerKw": 96,
+                "MassInServiceKg": 1590,
+                "PowerToWeightRatio": 0,
+                "MaxPermissibleBrakedTrailerMassKg": 1300,
+                "MaxPermissibleUnbrakedTrailerMassKg": 750
+            },
+            "StatusCode": 0,
+            "StatusMessage": "Success",
+            "DocumentVersion": 191,
+            "GeneratedAt": "2024-05-15T21:53:16.721Z"
+        },
+        "ModelDetails": {
+            "ModelIdentification": {
+                "Make": "Peugeot",
+                "Range": "5008",
+                "Model": "5008 Active Premium Blue HDi S/S",
+                "ModelVariant": "BlueHDi S/S Active Premium",
+                "Series": "P87          ",
+                "Mark": 2,
+                "StartDate": "2020-12-14T00:00:00Z",
+                "EndDate": "2022-09-28T00:00:00Z",
+                "CountryOfOrigin": "France",
+                "VariantCode": 1
+            },
+            "ModelClassification": {
+                "TypeApprovalCategory": "M1",
+                "MarketSectorCode": "AA",
+                "VehicleClass": "Car",
+                "TaxationClass": "Car"
+            },
+            "AdditionalInformation": {
+                "VehicleWarrantyInformation": {
+                    "ManufacturerWarrantyMiles": null,
+                    "ManufacturerWarrantyMonths": null
+                },
+                "SubscriptionOptionList": [],
+                "Software": {
+                    "SupportsOverTheAirSoftwareUpdate": null
+                }
+            },
+            "BodyDetails": {
+                "BodyShape": null,
+                "BodyStyle": "SUV",
+                "CabType": null,
+                "PlatformName": null,
+                "PlatformIsSharedAcrossModels": null,
+                "WheelbaseType": "Short Wheelbase",
+                "NumberOfAxles": 2,
+                "NumberOfDoors": 5,
+                "NumberOfSeats": 7,
+                "PayloadVolumeLitres": null,
+                "FuelTankCapacityLitres": 56
+            },
+            "Dimensions": {
+                "HeightMm": 1646,
+                "LengthMm": 4641,
+                "WidthMm": 1844,
+                "WheelbaseLengthMm": 2840,
+                "InternalLoadLengthMm": null
+            },
+            "Weights": {
+                "KerbWeightKg": 1515,
+                "GrossTrainWeightKg": 3500,
+                "UnladenWeightKg": null,
+                "PayloadWeightKg": null,
+                "GrossVehicleWeightKg": 2200,
+                "GrossCombinedWeightKg": 2200
+            },
+            "Powertrain": {
+                "PowertrainType": "ICE",
+                "FuelType": "Diesel",
+                "IceDetails": {
+                    "EngineFamily": null,
+                    "EngineLocation": "Front",
+                    "EngineDescription": "DV5RC",
+                    "EngineManufacturer": "Peugeot",
+                    "FuelDelivery": null,
+                    "Aspiration": "Turbocharged",
+                    "CylinderArrangement": "Inline",
+                    "NumberOfCylinders": 4,
+                    "BoreMm": 75,
+                    "StrokeMm": 85,
+                    "ValveGear": "DOHC",
+                    "ValvesPerCylinder": 4,
+                    "EngineCapacityCc": 1499,
+                    "EngineCapacityLitres": 1.5
+                },
+                "EvDetails": null,
+                "Transmission": {
+                    "TransmissionType": "Manual",
+                    "NumberOfGears": 6,
+                    "DriveType": "4x2",
+                    "DrivingAxle": "Front"
+                }
+            },
+            "Safety": {
+                "EuroNcap": {
+                    "NcapStarRating": 5,
+                    "NcapChildPercent": 85,
+                    "NcapAdultPercent": 86,
+                    "NcapPedestrianPercent": 67,
+                    "NcapSafetyAssistPercent": 58
+                }
+            },
+            "Emissions": {
+                "EuroStatus": "6d",
+                "ManufacturerCo2": 106,
+                "SoundLevels": {
+                    "StationaryDb": 74,
+                    "EngineSpeedRpm": 2813,
+                    "DriveByDb": 67
+                }
+            },
+            "Performance": {
+                "DragCoefficient": null,
+                "Torque": {
+                    "Nm": 300,
+                    "LbFt": 221.4,
+                    "Rpm": 1750
+                },
+                "Power": {
+                    "Bhp": 128.7,
+                    "Ps": 130.5,
+                    "Kw": 96,
+                    "Rpm": 3750
+                },
+                "Statistics": {
+                    "ZeroToSixtyMph": null,
+                    "ZeroToOneHundredKph": 11.1,
+                    "MaxSpeedKph": 191,
+                    "MaxSpeedMph": 119
+                },
+                "FuelEconomy": {
+                    "UrbanColdMpg": null,
+                    "ExtraUrbanMpg": null,
+                    "CombinedMpg": 61.4,
+                    "UrbanColdL100Km": null,
+                    "ExtraUrbanL100Km": null,
+                    "CombinedL100Km": 4.6
+                }
+            },
+            "StatusCode": 0,
+            "StatusMessage": "Success",
+            "DocumentVersion": 27,
+            "GeneratedAt": "2025-09-22T06:16:06.972Z"
+        },
+        "VehicleCodes": {
+            "Uvc": "M-JGJGW",
+            "StatusCode": 0,
+            "StatusMessage": "Success",
+            "DocumentVersion": 1
+        }
+    }
+}

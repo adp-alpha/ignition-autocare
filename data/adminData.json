@@ -1,0 +1,429 @@
+{
+  "defaultLeadTime": 0,
+  "motClass4": {
+    "enabled": true,
+    "standardPrice": 45,
+    "leadTime": 0,
+    "leadTimeEnabled": true,
+    "availability": [
+      "Mo",
+      "We",
+      "Fr"
+    ],
+    "discounts": {
+      "priceWithInterimService": {
+        "price": 75,
+        "enabled": false
+      },
+      "priceWithFullService": {
+        "price": 29.99,
+        "enabled": true
+      },
+      "priceWithMajorService": {
+        "price": 19.99,
+        "enabled": true
+      }
+    }
+  },
+  "motClass7": {
+    "enabled": false,
+    "standardPrice": 20,
+    "leadTime": 0,
+    "leadTimeEnabled": false,
+    "availability": [
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa"
+    ],
+    "discounts": {
+      "priceWithInterimService": {
+        "price": 0,
+        "enabled": false
+      },
+      "priceWithFullService": {
+        "price": 0,
+        "enabled": false
+      },
+      "priceWithMajorService": {
+        "price": 0,
+        "enabled": false
+      }
+    }
+  },
+  "deliveryOptions": [
+    {
+      "enabled": false,
+      "name": "Loan Car",
+      "availability": [
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Su"
+      ],
+      "allowMOTs": false,
+      "priceWithMOT": 15,
+      "priceWithService": 20,
+      "leadTime": 3,
+      "leadTimeEnabled": true,
+      "maxDistance": "N/A"
+    },
+    {
+      "enabled": false,
+      "name": "Collect & Deliver",
+      "availability": [
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa",
+        "Su"
+      ],
+      "allowMOTs": false,
+      "priceWithMOT": 15,
+      "priceWithService": 20,
+      "leadTime": 3,
+      "leadTimeEnabled": true,
+      "maxDistance": 3
+    },
+    {
+      "enabled": true,
+      "name": "Customer Drop-off",
+      "availability": [
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa",
+        "Su"
+      ],
+      "allowMOTs": true,
+      "priceWithMOT": 0,
+      "priceWithService": 0,
+      "leadTime": 1,
+      "leadTimeEnabled": true,
+      "maxDistance": 5
+    }
+  ],
+  "customProducts": [
+    {
+      "enabled": true,
+      "name": "Full Wheel Alignment",
+      "extraDescription": "Full Wheel Alignment. Introductory offer from £99",
+      "below2000ccPrice": 99,
+      "above2000ccPrice": 99,
+      "petrol": true,
+      "diesel": false,
+      "electric": false
+    }
+  ],
+  "singlePriceProducts": [
+    {
+      "enabled": true,
+      "name": "AdBlue",
+      "defaultPrice": 20,
+      "enableServicePrice": false,
+      "priceWithService": null
+    },
+    {
+      "enabled": false,
+      "name": "Car Wash & Vacuum",
+      "defaultPrice": 20,
+      "enableServicePrice": false,
+      "priceWithService": null
+    },
+    {
+      "enabled": false,
+      "name": "Coronavirus Neutraliser for Car Interiors",
+      "defaultPrice": 25,
+      "enableServicePrice": false,
+      "priceWithService": null
+    },
+    {
+      "enabled": true,
+      "name": "DPF Cleaning",
+      "defaultPrice": 170,
+      "enableServicePrice": false,
+      "priceWithService": null
+    },
+    {
+      "enabled": false,
+      "name": "Pre MOT",
+      "defaultPrice": 10,
+      "enableServicePrice": false,
+      "priceWithService": null
+    },
+    {
+      "enabled": true,
+      "name": "Summer Health Check",
+      "defaultPrice": 20,
+      "enableServicePrice": false,
+      "priceWithService": null
+    },
+    {
+      "enabled": true,
+      "name": "Winter Health Check",
+      "defaultPrice": 20,
+      "enableServicePrice": false,
+      "priceWithService": null
+    }
+  ],
+  "products": [
+    {
+      "enabled": true,
+      "name": "Air Conditioning Re-gas R1234YF",
+      "0cc-1500cc": 99,
+      "1501cc-2400cc": 99,
+      "2401cc or above": 99
+    },
+    {
+      "enabled": true,
+      "name": "Air Conditioning Re-gas R134A",
+      "0cc-1500cc": 69,
+      "1501cc-2400cc": 69,
+      "2401cc or above": 69
+    },
+    {
+      "enabled": true,
+      "name": "Brake Fluid Replacement",
+      "0cc-1500cc": 59,
+      "1501cc-2400cc": 66,
+      "2401cc or above": 59
+    },
+    {
+      "enabled": true,
+      "name": "Coolant Change",
+      "0cc-1500cc": 60,
+      "1501cc-2400cc": 60,
+      "2401cc or above": 80
+    },
+    {
+      "enabled": true,
+      "name": "Diagnostic Check",
+      "0cc-1500cc": 50,
+      "1501cc-2400cc": 50,
+      "2401cc or above": 50
+    },
+    {
+      "enabled": true,
+      "name": "Front Wheel Alignment",
+      "0cc-1500cc": 59,
+      "1501cc-2400cc": 59,
+      "2401cc or above": 59
+    }
+  ],
+  "vehicleSafetyCheck": {
+    "isVehicleSafetyCheckEnabled": true,
+    "isFreeVehicleSafetyCheckEnabled": true,
+    "price": 46.99,
+    "priceWithMOT": {
+      "price": 63.85,
+      "enabled": false
+    },
+    "priceWithInterimService": {
+      "price": 74.85,
+      "enabled": false
+    },
+    "priceWithFullService": {
+      "price": 54.85,
+      "enabled": false
+    },
+    "priceWithMajorService": {
+      "price": 54.85,
+      "enabled": false
+    }
+  },
+  "servicePricing": {
+    "prices": {
+      "0cc-1200cc": {
+        "oilChange": 95.36399999999999,
+        "interim": 125.604,
+        "full": 146.484,
+        "major": 211.284
+      },
+      "1201cc-1500cc": {
+        "oilChange": 118.38,
+        "interim": 150.06,
+        "full": 173.964,
+        "major": 231.564
+      },
+      "1501cc-2000cc": {
+        "oilChange": 126.792,
+        "interim": 189.672,
+        "full": 202.776,
+        "major": 260.376
+      },
+      "2001cc-2400cc": {
+        "oilChange": 135.84,
+        "interim": 183,
+        "full": 231,
+        "major": 288.6
+      },
+      "2401cc-3500cc": {
+        "oilChange": 135.84,
+        "interim": 173.4,
+        "full": 221.4,
+        "major": 279
+      },
+      "3501cc or above": {
+        "oilChange": 153.624,
+        "interim": 216.912,
+        "full": 250.512,
+        "major": 308.112
+      }
+    },
+    "oilQty": {
+      "0cc-1200cc": 3,
+      "1201cc-1500cc": 5,
+      "1501cc-2000cc": 6,
+      "2001cc-2400cc": 6,
+      "2401cc-3500cc": 6,
+      "3501cc or above": 8
+    },
+    "partCosts": {
+      "airFilter": {
+        "0cc-1200cc": 12,
+        "1201cc-1500cc": 12,
+        "1501cc-2000cc": 20,
+        "2001cc-2400cc": 23.7,
+        "2401cc-3500cc": 15.7,
+        "3501cc or above": 19.14
+      },
+      "pollenFilter": {
+        "0cc-1200cc": 5.4,
+        "1201cc-1500cc": 7.92,
+        "1501cc-2000cc": 16.92,
+        "2001cc-2400cc": 28,
+        "2401cc-3500cc": 28,
+        "3501cc or above": 28
+      },
+      "oilFilter": {
+        "0cc-1200cc": 5.64,
+        "1201cc-1500cc": 6,
+        "1501cc-2000cc": 6,
+        "2001cc-2400cc": 8.74,
+        "2401cc-3500cc": 8.74,
+        "3501cc or above": 9.54
+      }
+    },
+    "hourlyRates": {
+      "oilChange": {
+        "0cc-1200cc": 0.88,
+        "1201cc-1500cc": 0.96,
+        "1501cc-2000cc": 0.96,
+        "2001cc-2400cc": 1.04,
+        "2401cc-3500cc": 1.04,
+        "3501cc or above": 1.04
+      },
+      "interim": {
+        "0cc-1200cc": 1.1,
+        "1201cc-1500cc": 1.2,
+        "1501cc-2000cc": 1.5,
+        "2001cc-2400cc": 1.3,
+        "2401cc-3500cc": 1.3,
+        "3501cc or above": 1.6
+      },
+      "full": {
+        "0cc-1200cc": 1.3,
+        "1201cc-1500cc": 1.4,
+        "1501cc-2000cc": 1.4,
+        "2001cc-2400cc": 1.5,
+        "2401cc-3500cc": 1.5,
+        "3501cc or above": 1.6
+      },
+      "major": {
+        "0cc-1200cc": 2.2,
+        "1201cc-1500cc": 2.2,
+        "1501cc-2000cc": 2.2,
+        "2001cc-2400cc": 2.3,
+        "2401cc-3500cc": 2.3,
+        "3501cc or above": 2.4
+      }
+    }
+  },
+  "servicingRates": {
+    "servicingLeadTime": 0,
+    "servicingLeadTimeEnabled": true,
+    "serviceLabourRate": 60,
+    "electricalVehicleLabourRate": 60,
+    "standardOilPrice": 7.01,
+    "specialistOilPrice": 9.5
+  },
+  "offers": [],
+  "commonRepairs": {
+    "mechanicalLabourRate": 60,
+    "repairs": [
+      {
+        "enabled": true,
+        "product": "Clutch Replacement",
+        "oemPartsPriceModifier": 19,
+        "oemPartsModifierIsIncrease": true,
+        "examplePrice": 752.4,
+        "leadTimeEnabled": true,
+        "leadTime": 1,
+        "priceType": "EXAMPLE"
+      },
+      {
+        "enabled": true,
+        "product": "Front Brakes (Discs & Pads)",
+        "oemPartsPriceModifier": 10,
+        "oemPartsModifierIsIncrease": true,
+        "examplePrice": 302.4,
+        "leadTimeEnabled": true,
+        "leadTime": 1,
+        "priceType": "EXAMPLE"
+      },
+      {
+        "enabled": true,
+        "product": "Front Brakes (Pads)",
+        "oemPartsPriceModifier": 10,
+        "oemPartsModifierIsIncrease": true,
+        "examplePrice": 174,
+        "leadTimeEnabled": true,
+        "leadTime": 1,
+        "priceType": "REVEAL"
+      },
+      {
+        "enabled": true,
+        "product": "Rear Brakes (Discs & Pads)",
+        "oemPartsPriceModifier": 10,
+        "oemPartsModifierIsIncrease": true,
+        "examplePrice": 0,
+        "leadTimeEnabled": true,
+        "leadTime": 1,
+        "priceType": "REVEAL"
+      },
+      {
+        "enabled": true,
+        "product": "Rear Brakes (Pads)",
+        "oemPartsPriceModifier": 10,
+        "oemPartsModifierIsIncrease": true,
+        "examplePrice": 0,
+        "leadTimeEnabled": true,
+        "leadTime": 1,
+        "priceType": "REVEAL"
+      },
+      {
+        "enabled": true,
+        "product": "General Repair",
+        "oemPartsPriceModifier": 10,
+        "oemPartsModifierIsIncrease": true,
+        "examplePrice": 0,
+        "leadTimeEnabled": true,
+        "leadTime": 1,
+        "priceType": "REVEAL"
+      }
+    ]
+  },
+  "offersAndExtras": {
+    "manufacturerService": true,
+    "monthlyRepaymentOptions": true,
+    "servicePlanEligibilityCheck": true,
+    "videoAuthorisation": false
+  }
+}
