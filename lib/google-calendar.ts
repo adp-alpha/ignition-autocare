@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { formatServicesForDisplay } from './booking-utils';
+import { sendBookingConfirmationEmail } from './email-service';
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
@@ -97,10 +98,51 @@ ${booking.isBlueLightCardHolder ? '\n✓ Blue Light Card Holder' : ''}
 ${booking.notes ? `NOTES:\n${booking.notes}` : ''}
     `.trim();
 
+    // Create a customer-friendly summary for the email
+    const customerSummary = `Booking Confirmed: ${servicesDescription} - ${booking.vrm}`;
+    
+    // Create a more detailed customer-friendly description
+    const customerDescription = `
+🚗 BOOKING CONFIRMATION
+
+Dear ${customer.firstName} ${customer.lastName},
+
+Your booking has been confirmed! Here are the details:
+
+📅 DATE & TIME: ${new Date(startDateTime).toLocaleDateString('en-GB', {
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long',
+      day: 'numeric'
+    })} at ${booking.startTime}
+
+🚙 VEHICLE: ${booking.vrm} - ${booking.make} ${booking.model}
+
+🔧 SERVICES BOOKED:
+${servicesDescription}
+
+💰 TOTAL PRICE: £${parseFloat(booking.totalPrice).toFixed(2)}
+${booking.isBlueLightCardHolder ? '✅ Blue Light Card Discount Applied' : ''}
+
+📍 LOCATION: Ignition Autocare
+Please arrive 10 minutes before your appointment time.
+
+📞 CONTACT: If you need to reschedule or have any questions, please contact us.
+
+🎫 BOOKING REFERENCE: ${booking.bookingReference}
+
+${booking.notes ? `📝 SPECIAL NOTES: ${booking.notes}` : ''}
+
+Thank you for choosing Ignition Autocare!
+
+---
+This is an automated confirmation. Please save this email for your records.
+    `.trim();
+
     // Create event
     const event = {
-      summary: `${servicesDescription} - ${booking.vrm}`,
-      description,
+      summary: customerSummary,
+      description: customerDescription,
       start: {
         dateTime: startDateTime,
         timeZone: 'Europe/London',
@@ -109,18 +151,20 @@ ${booking.notes ? `NOTES:\n${booking.notes}` : ''}
         dateTime: endDateTime,
         timeZone: 'Europe/London',
       },
+      // Note: Attendees removed due to service account limitations
+      // The customer will receive email confirmation separately
       reminders: {
         useDefault: false,
         overrides: [
           { method: 'email', minutes: 24 * 60 }, // 1 day before
-          { method: 'popup', minutes: 60 }, // 1 hour before
-        ],
-        // mail to the customer as well
-        attendees: [
-          { email: customer.email },
+          { method: 'email', minutes: 60 }, // 1 hour before
+          { method: 'popup', minutes: 15 }, // 15 minutes before
         ],
       },
       colorId: '5', // Yellow color for bookings
+      guestsCanModify: false,
+      guestsCanInviteOthers: false,
+      guestsCanSeeOtherGuests: false,
     };
 
     const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
@@ -133,6 +177,15 @@ ${booking.notes ? `NOTES:\n${booking.notes}` : ''}
 
     console.log('✅ Google Calendar event created:', response.data.id);
     console.log('   Event link:', response.data.htmlLink);
+
+    // Send booking confirmation email to customer
+    try {
+      await sendBookingConfirmationEmail(data);
+      console.log('✅ Booking confirmation email sent to customer');
+    } catch (emailError) {
+      console.error('⚠️ Calendar event created but email failed:', emailError);
+      // Don't throw here - calendar event was successful
+    }
 
     return response.data.id!;
   } catch (error) {

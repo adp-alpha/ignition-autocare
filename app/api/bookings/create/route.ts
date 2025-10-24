@@ -1,5 +1,6 @@
 import { generateBookingReference, validateBookingRequest } from '@/lib/booking-utils';
 import { addEventToGoogleCalendar } from '@/lib/google-calendar';
+import { sendBookingConfirmationEmail } from '@/lib/email-service';
 import { prisma } from '@/lib/prisma';
 import { BookingResponse, CreateBookingRequest } from '@/types/booking';
 import { NextRequest, NextResponse } from 'next/server';
@@ -228,7 +229,20 @@ export async function POST(request: NextRequest) {
       console.log('✅ Booking created and synced to Google Calendar:', result.booking.bookingReference);
     } catch (calendarError) {
       console.error('⚠️ Failed to add to Google Calendar:', calendarError);
-      // Don't fail the booking if calendar sync fails
+      
+      // Send email confirmation as fallback if Google Calendar fails
+      try {
+        await sendBookingConfirmationEmail({
+          booking: {
+            ...result.booking,
+            bookingDateString: result.originalDateString,
+          },
+          customer: result.customer,
+        });
+        console.log('✅ Fallback email confirmation sent successfully');
+      } catch (emailError) {
+        console.error('❌ Failed to send fallback email confirmation:', emailError);
+      }
     }
 
     const response: BookingResponse = {
