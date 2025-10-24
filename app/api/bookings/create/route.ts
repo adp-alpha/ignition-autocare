@@ -1,7 +1,7 @@
 import { generateBookingReference, validateBookingRequest } from '@/lib/booking-utils';
 import { processBookingNotificationsLightweight } from '@/lib/background-jobs';
 import { PerformanceMonitor } from '@/lib/performance-monitor';
-import { logEmailConfigStatus } from '@/lib/email-config-checker';
+import { logEnvironmentStatus } from '@/lib/environment-checker';
 import { prisma } from '@/lib/prisma';
 import { BookingResponse, CreateBookingRequest } from '@/types/booking';
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,10 +19,10 @@ let emailConfigLogged = false;
 export async function POST(request: NextRequest) {
   const monitor = new PerformanceMonitor('Booking Creation');
   
-  // Log email configuration status (only once per deployment)
-  if (!(globalThis as any).emailConfigLogged) {
-    logEmailConfigStatus();
-    (globalThis as any).emailConfigLogged = true;
+  // Log environment status (only once per deployment)
+  if (!emailConfigLogged) {
+    logEnvironmentStatus();
+    emailConfigLogged = true;
   }
   
   try {

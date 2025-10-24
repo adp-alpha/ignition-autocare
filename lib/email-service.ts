@@ -21,25 +21,15 @@ function createTransporter() {
 
   // DigitalOcean-optimized SMTP configuration
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // Use STARTTLS
-    pool: true,
-    maxConnections: 3,
-    maxMessages: 50,
-    connectionTimeout: 30000, // 30 seconds (longer for DigitalOcean)
-    greetingTimeout: 10000,   // 10 seconds
-    socketTimeout: 30000,     // 30 seconds
-    logger: process.env.NODE_ENV === 'development',
-    debug: process.env.NODE_ENV === 'development',
-    auth: {
-      user: process.env.SMTP_EMAIL_USER,
-      pass: process.env.SMTP_EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false, // Allow self-signed certificates
-      ciphers: 'SSLv3'
-    }
+    service: "gmail",
+  auth: {
+    user: process.env.SMTP_EMAIL_USER,
+    pass: process.env.SMTP_EMAIL_PASS,
+  },
+  // Anti-spam configurations
+  pool: true,
+  maxConnections: 5,
+  maxMessages: 10,
   });
 }
 
