@@ -22,14 +22,14 @@ function createTransporter() {
   // DigitalOcean-optimized SMTP configuration
   return nodemailer.createTransport({
     service: "gmail",
-  auth: {
-    user: process.env.SMTP_EMAIL_USER,
-    pass: process.env.SMTP_EMAIL_PASS,
-  },
-  // Anti-spam configurations
-  pool: true,
-  maxConnections: 5,
-  maxMessages: 10,
+    auth: {
+      user: process.env.SMTP_EMAIL_USER,
+      pass: process.env.SMTP_EMAIL_PASS,
+    },
+    // Anti-spam configurations
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 10,
   });
 }
 
@@ -263,14 +263,23 @@ export async function sendBookingConfirmationEmail(
   const { booking, customer } = data;
 
   // Check if we're in a problematic environment (like DigitalOcean)
-  const isProblematicEnvironment = process.env.DISABLE_EMAIL === 'true' || 
-                                   process.env.NODE_ENV === 'production';
+  const isProblematicEnvironment =
+    process.env.DISABLE_EMAIL === "true" ||
+    process.env.NODE_ENV === "production";
 
   if (isProblematicEnvironment) {
-    console.log(`📧 Email disabled for production environment - booking ${booking.bookingReference} confirmed without email`);
-    console.log(`📋 Customer details: ${customer.firstName} ${customer.lastName} (${customer.email})`);
-    console.log(`🚗 Vehicle: ${booking.vrm} - ${booking.make} ${booking.model}`);
-    console.log(`📅 Appointment: ${booking.bookingDateString} at ${booking.startTime}`);
+    console.log(
+      `📧 Email disabled for production environment - booking ${booking.bookingReference} confirmed without email`
+    );
+    console.log(
+      `📋 Customer details: ${customer.firstName} ${customer.lastName} (${customer.email})`
+    );
+    console.log(
+      `🚗 Vehicle: ${booking.vrm} - ${booking.make} ${booking.model}`
+    );
+    console.log(
+      `📅 Appointment: ${booking.bookingDateString} at ${booking.startTime}`
+    );
     console.log(`💰 Total: £${booking.totalPrice}`);
     return;
   }
@@ -309,9 +318,12 @@ export async function sendBookingConfirmationEmail(
     // Quick timeout for email - don't let it block the system
     const result = await Promise.race([
       sendEmailWithFallback(mailOptions),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Email timeout - continuing without email')), 10000)
-      )
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Email timeout - continuing without email")),
+          10000
+        )
+      ),
     ]);
 
     console.log("✅ Booking confirmation email sent successfully:", {
@@ -324,7 +336,7 @@ export async function sendBookingConfirmationEmail(
     console.warn("⚠️ Email failed but booking is still confirmed:", {
       bookingReference: booking.bookingReference,
       customerEmail: customer.email,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     });
     console.log("📋 Booking confirmed without email notification");
   }
