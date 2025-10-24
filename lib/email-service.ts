@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import nodemailer, { SentMessageInfo } from "nodemailer";
 import { formatServicesForDisplay } from "./booking-utils";
 
 interface BookingEmailData {
@@ -10,34 +10,21 @@ interface BookingEmailData {
  * Create email transporter
  */
 function createTransporter() {
-  // You can configure this with your preferred email service
-  // Examples: Gmail, SendGrid, AWS SES, etc.
-
-  if (process.env.EMAIL_SERVICE === "gmail") {
-    return nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD, // Use app password, not regular password
-      },
-    });
+  // Check if email credentials are configured
+  if (!process.env.SMTP_EMAIL_USER || !process.env.SMTP_EMAIL_PASS) {
+    console.warn('⚠️ Email credentials not configured - emails will be skipped');
+    return null;
   }
 
-  if (process.env.EMAIL_SERVICE === "sendgrid") {
-    return nodemailer.createTransport({
-      host: "smtp.sendgrid.net",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "apikey",
-        pass: process.env.SENDGRID_API_KEY,
-      },
-    });
-  }
-
-  // Default SMTP configuration
+  // Create transporter with timeout and connection settings
   return nodemailer.createTransport({
-    service:"gmail",
+    service: "gmail",
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 5000,    // 5 seconds  
+    socketTimeout: 15000,     // 15 seconds
     auth: {
       user: process.env.SMTP_EMAIL_USER,
       pass: process.env.SMTP_EMAIL_PASS,
@@ -274,6 +261,13 @@ export async function sendBookingConfirmationEmail(
 ): Promise<void> {
   try {
     const transporter = createTransporter();
+    
+    // Skip email if transporter is not configured
+    if (!transporter) {
+      console.log('📧 Email service not configured - skipping email for booking:', data.booking.bookingReference);
+      return;
+    }
+
     const { booking, customer } = data;
 
     const mailOptions = {
@@ -295,10 +289,16 @@ export async function sendBookingConfirmationEmail(
       },
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    // Add timeout wrapper for the email sending
+    const result = await Promise.race([
+      transporter.sendMail(mailOptions),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Email send timeout after 20 seconds')), 20000)
+      )
+    ]);
 
     console.log("✅ Booking confirmation email sent successfully:", {
-      messageId: result.messageId,
+      messageId: (result as any).messageId,
       bookingReference: booking.bookingReference,
       customerEmail: customer.email,
     });
@@ -320,6 +320,12 @@ export async function sendBookingReminderEmail(
 ): Promise<void> {
   try {
     const transporter = createTransporter();
+    
+    // Skip email if transporter is not configured
+    if (!transporter) {
+      console.log('📧 Email service not configured - skipping reminder for booking:', data.booking.bookingReference);
+      return;
+    }
     const { booking, customer } = data;
 
     const bookingDate = new Date(
