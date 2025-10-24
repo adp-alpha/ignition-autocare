@@ -1,6 +1,6 @@
 import { generateBookingReference, validateBookingRequest } from '@/lib/booking-utils';
-import { addEventToGoogleCalendar } from '@/lib/google-calendar';
-import { sendBookingConfirmationEmail } from '@/lib/email-service';
+import { processBookingNotificationsLightweight } from '@/lib/background-jobs';
+import { PerformanceMonitor } from '@/lib/performance-monitor';
 import { prisma } from '@/lib/prisma';
 import { BookingResponse, CreateBookingRequest } from '@/types/booking';
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,11 +13,15 @@ import { NextRequest, NextResponse } from 'next/server';
  * Create a new booking
  */
 export async function POST(request: NextRequest) {
+  const monitor = new PerformanceMonitor('Booking Creation');
+  
   try {
     const body: CreateBookingRequest = await request.json();
+    monitor.checkpoint('Request parsed');
 
     // Validate request
     const validation = validateBookingRequest(body);
+    monitor.checkpoint('Request validated');
     if (!validation.valid) {
       return NextResponse.json(
         {
@@ -130,6 +134,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Short transaction - only write operations
+    monitor.checkpoint('Starting database transaction');
     const result = await prisma.$transaction(async (tx) => {
       // Find or create customer
       let customer = await tx.customer.findFirst({
@@ -204,57 +209,28 @@ export async function POST(request: NextRequest) {
 
       return { booking, customer, originalDateString: body.slot.date };
     }, {
-      maxWait: 10000,
-      timeout: 15000,
+      maxWait: 5000,
+      timeout: 8000,
     });
+    
+    monitor.checkpoint('Database transaction completed');
 
-    // Add to Google Calendar (outside transaction)
-    let googleEventId: string | undefined;
-    try {
-      googleEventId = await addEventToGoogleCalendar({
-        booking: {
-          ...result.booking,
-          // Pass the original date string to avoid timezone issues
-          bookingDateString: result.originalDateString,
-        },
-        customer: result.customer,
-      });
-
-      // Update booking with Google Calendar event ID
-      await prisma.booking.update({
-        where: { id: result.booking.id },
-        data: { googleCalendarEventId: googleEventId },
-      });
-
-      console.log('✅ Booking created and synced to Google Calendar:', result.booking.bookingReference);
-    } catch (calendarError) {
-      console.error('⚠️ Failed to add to Google Calendar:', calendarError);
-      
-      // Send email confirmation as fallback if Google Calendar fails
-      try {
-        await sendBookingConfirmationEmail({
-          booking: {
-            ...result.booking,
-            bookingDateString: result.originalDateString,
-          },
-          customer: result.customer,
-        });
-        console.log('✅ Fallback email confirmation sent successfully');
-      } catch (emailError) {
-        console.error('❌ Failed to send fallback email confirmation:', emailError);
-      }
-    }
-
+    // Return success response immediately - don't wait for external services
     const response: BookingResponse = {
       success: true,
       bookingId: result.booking.id,
       bookingReference: result.booking.bookingReference,
-      googleCalendarEventId: googleEventId,
       message: 'Booking created successfully',
     };
 
+    // Process external services asynchronously (fire and forget)
+    processBookingNotificationsLightweight(result.booking, result.customer, result.originalDateString);
+    monitor.checkpoint('Background jobs queued');
+
+    monitor.finish(true);
     return NextResponse.json(response, { status: 201 });
   } catch (error: any) {
+    monitor.finish(false);
     console.error('❌ Error creating booking:', error);
 
     const response: BookingResponse = {

@@ -178,14 +178,7 @@ This is an automated confirmation. Please save this email for your records.
     console.log('✅ Google Calendar event created:', response.data.id);
     console.log('   Event link:', response.data.htmlLink);
 
-    // Send booking confirmation email to customer
-    try {
-      await sendBookingConfirmationEmail(data);
-      console.log('✅ Booking confirmation email sent to customer');
-    } catch (emailError) {
-      console.error('⚠️ Calendar event created but email failed:', emailError);
-      // Don't throw here - calendar event was successful
-    }
+    // Note: Email confirmation is now handled separately in the booking API
 
     return response.data.id!;
   } catch (error) {
