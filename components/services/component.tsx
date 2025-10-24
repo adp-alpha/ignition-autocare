@@ -76,10 +76,11 @@ export const CustomCheckbox = memo(({ checked }: { checked: boolean }) => (
 ));
 CustomCheckbox.displayName = "CustomCheckbox";
 
-export const renderStars = () => (
+export const RenderStars = memo(() => (
   <div className="flex items-center gap-0.5">
     {[...Array(5)].map((_, i) => (
       <StarIcon key={i} className="w-5 h-5 text-yellow-500" />
     ))}
   </div>
-);
+));
+RenderStars.displayName = "RenderStars";

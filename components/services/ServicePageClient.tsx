@@ -28,7 +28,7 @@ import {
   CustomCheckbox,
   InfoIcon,
   LocationIcon,
-  renderStars,
+  RenderStars,
   StarIcon,
 } from "./component";
 
@@ -748,25 +748,25 @@ const ServicePageClient = ({
                     <span className="text-base font-medium text-gray-700">
                       Value
                     </span>
-                    {renderStars()}
+                    <RenderStars />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-base font-medium text-gray-700">
                       Staff helpfulness
                     </span>
-                    {renderStars()}
+                    <RenderStars />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-base font-medium text-gray-700">
                       Quality of work
                     </span>
-                    {renderStars()}
+                    <RenderStars />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-base font-medium text-gray-700">
                       Communication
                     </span>
-                    {renderStars()}
+                    <RenderStars />
                   </div>
                 </div>
               </div>

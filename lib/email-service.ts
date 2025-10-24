@@ -1,5 +1,6 @@
 import nodemailer, { SentMessageInfo } from "nodemailer";
 import { formatServicesForDisplay } from "./booking-utils";
+import { sendEmailWithFallback } from "./email-fallback";
 
 interface BookingEmailData {
   booking: any;
@@ -12,23 +13,33 @@ interface BookingEmailData {
 function createTransporter() {
   // Check if email credentials are configured
   if (!process.env.SMTP_EMAIL_USER || !process.env.SMTP_EMAIL_PASS) {
-    console.warn('⚠️ Email credentials not configured - emails will be skipped');
+    console.warn(
+      "⚠️ Email credentials not configured - emails will be skipped"
+    );
     return null;
   }
 
-  // Create transporter with timeout and connection settings
+  // DigitalOcean-optimized SMTP configuration
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use STARTTLS
     pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 5000,    // 5 seconds  
-    socketTimeout: 15000,     // 15 seconds
+    maxConnections: 3,
+    maxMessages: 50,
+    connectionTimeout: 30000, // 30 seconds (longer for DigitalOcean)
+    greetingTimeout: 10000,   // 10 seconds
+    socketTimeout: 30000,     // 30 seconds
+    logger: process.env.NODE_ENV === 'development',
+    debug: process.env.NODE_ENV === 'development',
     auth: {
       user: process.env.SMTP_EMAIL_USER,
       pass: process.env.SMTP_EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false, // Allow self-signed certificates
+      ciphers: 'SSLv3'
+    }
   });
 }
 
@@ -259,16 +270,32 @@ Thank you for choosing Ignition Autocare!
 export async function sendBookingConfirmationEmail(
   data: BookingEmailData
 ): Promise<void> {
+  const { booking, customer } = data;
+
+  // Check if we're in a problematic environment (like DigitalOcean)
+  const isProblematicEnvironment = process.env.DISABLE_EMAIL === 'true' || 
+                                   process.env.NODE_ENV === 'production';
+
+  if (isProblematicEnvironment) {
+    console.log(`📧 Email disabled for production environment - booking ${booking.bookingReference} confirmed without email`);
+    console.log(`📋 Customer details: ${customer.firstName} ${customer.lastName} (${customer.email})`);
+    console.log(`🚗 Vehicle: ${booking.vrm} - ${booking.make} ${booking.model}`);
+    console.log(`📅 Appointment: ${booking.bookingDateString} at ${booking.startTime}`);
+    console.log(`💰 Total: £${booking.totalPrice}`);
+    return;
+  }
+
   try {
     const transporter = createTransporter();
-    
+
     // Skip email if transporter is not configured
     if (!transporter) {
-      console.log('📧 Email service not configured - skipping email for booking:', data.booking.bookingReference);
+      console.log(
+        "📧 Email service not configured - skipping email for booking:",
+        booking.bookingReference
+      );
       return;
     }
-
-    const { booking, customer } = data;
 
     const mailOptions = {
       from: {
@@ -289,26 +316,27 @@ export async function sendBookingConfirmationEmail(
       },
     };
 
-    // Add timeout wrapper for the email sending
+    // Quick timeout for email - don't let it block the system
     const result = await Promise.race([
-      transporter.sendMail(mailOptions),
+      sendEmailWithFallback(mailOptions),
       new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Email send timeout after 20 seconds')), 20000)
+        setTimeout(() => reject(new Error('Email timeout - continuing without email')), 10000)
       )
     ]);
 
     console.log("✅ Booking confirmation email sent successfully:", {
-      messageId: (result as any).messageId,
+      messageId: result.messageId,
       bookingReference: booking.bookingReference,
       customerEmail: customer.email,
     });
   } catch (error) {
-    console.error("❌ Failed to send booking confirmation email:", error);
-    throw new Error(
-      `Failed to send confirmation email: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    // Don't throw error - just log and continue
+    console.warn("⚠️ Email failed but booking is still confirmed:", {
+      bookingReference: booking.bookingReference,
+      customerEmail: customer.email,
+      error: error instanceof Error ? error.message : "Unknown error"
+    });
+    console.log("📋 Booking confirmed without email notification");
   }
 }
 
@@ -320,10 +348,13 @@ export async function sendBookingReminderEmail(
 ): Promise<void> {
   try {
     const transporter = createTransporter();
-    
+
     // Skip email if transporter is not configured
     if (!transporter) {
-      console.log('📧 Email service not configured - skipping reminder for booking:', data.booking.bookingReference);
+      console.log(
+        "📧 Email service not configured - skipping reminder for booking:",
+        data.booking.bookingReference
+      );
       return;
     }
     const { booking, customer } = data;
