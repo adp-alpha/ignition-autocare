@@ -14,6 +14,7 @@ import { AvailableSlot, CreateBookingRequest } from "@/types/booking";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { validateCustomerDetails, formatUKPhoneNumber, validateEmail, validateName, validateUKPhoneNumber } from "@/lib/validation";
 import BookingSummary from "./BookingSummary";
 const ConfirmationPageClient = () => {
   const {
@@ -128,31 +129,82 @@ const ConfirmationPageClient = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
     if (name in customerDetails) {
-      setCustomerDetails((prev) => ({ ...prev, [name]: value }));
+      // Update customer details
+      const updatedDetails = { ...customerDetails, [name]: value };
+      setCustomerDetails(updatedDetails);
+
+      // Real-time validation for each field
+      const newErrors = { ...validationErrors };
+      
+      if (name === "firstName") {
+        const validation = validateName(value, "First name");
+        if (!validation.isValid && value.trim().length > 0) {
+          newErrors.firstName = validation.message!;
+        } else {
+          delete newErrors.firstName;
+        }
+      } else if (name === "lastName") {
+        const validation = validateName(value, "Last name");
+        if (!validation.isValid && value.trim().length > 0) {
+          newErrors.lastName = validation.message!;
+        } else {
+          delete newErrors.lastName;
+        }
+      } else if (name === "email") {
+        const validation = validateEmail(value);
+        // Show validation error immediately for email, even for short inputs
+        if (!validation.isValid && value.length > 0) {
+          newErrors.email = validation.message!;
+        } else {
+          delete newErrors.email;
+        }
+      } else if (name === "contactNumber") {
+        const validation = validateUKPhoneNumber(value);
+        if (!validation.isValid && value.trim().length > 0) {
+          newErrors.contactNumber = validation.message!;
+        } else {
+          delete newErrors.contactNumber;
+        }
+      }
+      
+      setValidationErrors(newErrors);
     } else if (name === "notes") {
       setNotes(value);
     }
   };
 
+  const handlePhoneBlur = () => {
+    if (customerDetails.contactNumber) {
+      const formatted = formatUKPhoneNumber(customerDetails.contactNumber);
+      setCustomerDetails((prev) => ({ ...prev, contactNumber: formatted }));
+    }
+  };
+
   const isFormValid = () => {
-    return (
-      selectedDate &&
-      selectedSlot &&
-      customerDetails.firstName &&
-      customerDetails.lastName &&
-      customerDetails.email &&
-      customerDetails.contactNumber &&
-      agreeToTerms
-    );
+    const validation = validateCustomerDetails(customerDetails);
+    return selectedDate && selectedSlot && validation.isValid && agreeToTerms;
   };
 
   const handleConfirmBooking = async () => {
+    // Validate all fields before submission
+    const validation = validateCustomerDetails(customerDetails);
+
+    if (!validation.isValid) {
+      setValidationErrors(validation.errors);
+      alert("Please fix the validation errors before submitting.");
+      return;
+    }
+
     if (!isFormValid()) {
       alert("Please fill in all required fields and agree to the terms.");
       return;
@@ -322,85 +374,91 @@ const ConfirmationPageClient = () => {
                   })}
                   .
                 </p>
-                <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8">
+                <div className="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8">
                   {/* Calendar Section */}
                   <div className="w-full">
-                    <Label className="text-base font-medium mb-3 block">
+                    <Label className="text-base font-medium mb-4 block">
                       Select a date
                     </Label>
-                    <div className="flex justify-center lg:justify-start">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={setSelectedDate}
-                        disabled={(date: Date) => {
-                          const yesterday = new Date();
-                          yesterday.setDate(yesterday.getDate() - 1);
-                          if (date < yesterday) return true;
+                    <div className="flex justify-center lg:justify-start px-2 lg:px-0">
+                      <div className="w-full max-w-[300px] lg:max-w-none">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          disabled={(date: Date) => {
+                            const yesterday = new Date();
+                            yesterday.setDate(yesterday.getDate() - 1);
+                            if (date < yesterday) return true;
 
-                          const dateString = date.toISOString().split("T")[0];
-                          return !availableDates.has(dateString);
-                        }}
-                        className="rounded-md border w-full max-w-sm lg:max-w-none"
-                      />
+                            const dateString = date.toISOString().split("T")[0];
+                            return !availableDates.has(dateString);
+                          }}
+                          className="rounded-md border w-full mx-auto lg:mx-0 scale-90 sm:scale-100"
+                        />
+                      </div>
                     </div>
                   </div>
 
                   {/* Time Slots Section */}
-                  <div className="w-full">
+                  <div className="w-full px-2 lg:px-0">
                     {selectedDate && availableTimeSlots.length > 0 && (
                       <>
-                        <Label className="text-base font-medium mb-3 block">
+                        <Label className="text-base font-medium mb-4 block">
                           Choose an available time slot
                         </Label>
-                        <ToggleGroup
-                          type="single"
-                          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-2 gap-3 w-full"
-                          value={selectedSlot?.id}
-                          onValueChange={(value: string) => {
-                            const slot = availableTimeSlots.find(
-                              (s) => s.id === value
-                            );
-                            setSelectedSlot(slot);
-                          }}
-                        >
-                          {availableTimeSlots.map((slot) => (
-                            <ToggleGroupItem
-                              key={slot.id}
-                              value={slot.id}
-                              aria-label={`Toggle ${slot.displayTime}`}
-                              disabled={slot.availableCapacity === 0}
-                              className="w-full text-sm py-3 px-4 min-h-[44px] justify-center"
-                            >
-                              {slot.displayTime}
-                            </ToggleGroupItem>
-                          ))}
-                        </ToggleGroup>
-                        <p className="text-sm text-gray-500 mt-3">
-                          Garages will confirm the exact time within your chosen
-                          slot.
-                        </p>
+                        <div className="space-y-3">
+                          <ToggleGroup
+                            type="single"
+                            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 w-full"
+                            value={selectedSlot?.id}
+                            onValueChange={(value: string) => {
+                              const slot = availableTimeSlots.find(
+                                (s) => s.id === value
+                              );
+                              setSelectedSlot(slot);
+                            }}
+                          >
+                            {availableTimeSlots.map((slot) => (
+                              <ToggleGroupItem
+                                key={slot.id}
+                                value={slot.id}
+                                aria-label={`Toggle ${slot.displayTime}`}
+                                disabled={slot.availableCapacity === 0}
+                                className="w-full text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 min-h-[40px] sm:min-h-[44px] justify-center"
+                              >
+                                {slot.displayTime}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                          <p className="text-sm text-gray-500">
+                            Garages will confirm the exact time within your
+                            chosen slot.
+                          </p>
+                        </div>
                       </>
                     )}
 
                     {selectedDate && availableTimeSlots.length === 0 && (
-                      <div className="text-gray-500 text-center lg:text-left">
-                        <Label className="text-base font-medium mb-3 block">
+                      <div className="text-gray-500">
+                        <Label className="text-base font-medium mb-4 block">
                           Time slots
                         </Label>
-                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg text-center lg:text-left">
                           <p>No available slots for this date.</p>
-                          <p className="text-sm">Please select another date.</p>
+                          <p className="text-sm mt-1">
+                            Please select another date.
+                          </p>
                         </div>
                       </div>
                     )}
 
                     {!selectedDate && (
                       <div className="text-gray-400">
-                        <Label className="text-base font-medium mb-3 block">
+                        <Label className="text-base font-medium mb-4 block">
                           Time slots
                         </Label>
-                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg text-center lg:text-left">
                           <p>
                             Please select a date first to see available time
                             slots.
@@ -427,45 +485,90 @@ const ConfirmationPageClient = () => {
             <h2 className="text-2xl font-bold">2. Your details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">First Name *</Label>
                 <Input
                   id="firstName"
                   name="firstName"
                   value={customerDetails.firstName}
                   onChange={handleInputChange}
+                  className={
+                    validationErrors.firstName
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
+                  placeholder="Enter your first name"
                   required
                 />
+                {validationErrors.firstName && (
+                  <p className="text-sm text-red-600">
+                    {validationErrors.firstName}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName">Last Name *</Label>
                 <Input
                   id="lastName"
                   name="lastName"
                   value={customerDetails.lastName}
                   onChange={handleInputChange}
+                  className={
+                    validationErrors.lastName
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
+                  placeholder="Enter your last name"
                   required
                 />
+                {validationErrors.lastName && (
+                  <p className="text-sm text-red-600">
+                    {validationErrors.lastName}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">Email Address *</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   value={customerDetails.email}
                   onChange={handleInputChange}
+                  className={
+                    validationErrors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
+                  placeholder="your.email@example.com"
                   required
                 />
+                {validationErrors.email && (
+                  <p className="text-sm text-red-600">
+                    {validationErrors.email}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactNumber">Contact Number</Label>
+                <Label htmlFor="contactNumber">UK Phone Number *</Label>
                 <Input
                   id="contactNumber"
                   name="contactNumber"
                   value={customerDetails.contactNumber}
                   onChange={handleInputChange}
+                  onBlur={handlePhoneBlur}
+                  className={
+                    validationErrors.contactNumber
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
+                  placeholder="07123 456789 or 01234 567890"
                   required
                 />
+                {validationErrors.contactNumber && (
+                  <p className="text-sm text-red-600">
+                    {validationErrors.contactNumber}
+                  </p>
+                )}
               </div>
             </div>
           </div>
