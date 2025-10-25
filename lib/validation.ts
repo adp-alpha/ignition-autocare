@@ -100,12 +100,22 @@ export function validateUKPhoneNumber(phone: string): ValidationResult {
   // Remove all spaces, dashes, and brackets for validation
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
 
-  // UK phone number patterns
+  // UK phone numbers MUST start with 0 (domestic format)
+  if (!cleanPhone.startsWith("0")) {
+    return {
+      isValid: false,
+      message:
+        "UK phone number must start with 0 (e.g., 07700 900456 or 01234 567890)",
+    };
+  }
+
+  // UK phone number patterns (with leading 0)
   const ukPatterns = [
-    /^(\+44|0044|44)?[1-9]\d{8,9}$/, // Standard UK numbers
-    /^(\+44|0044|44)?7\d{9}$/, // UK mobile numbers
-    /^(\+44|0044|44)?[1-2]\d{9}$/, // UK landline numbers
-    /^(\+44|0044|44)?[3-9]\d{8,9}$/, // Other UK numbers
+    /^07\d{9}$/, // UK mobile numbers: 07xxxxxxxxx (11 digits total)
+    /^01\d{9}$/, // UK landline numbers: 01xxxxxxxxx (11 digits total)
+    /^02\d{8}$/, // London landlines: 02xxxxxxxx (10 digits total)
+    /^03\d{9}$/, // UK non-geographic: 03xxxxxxxxx (11 digits total)
+    /^08\d{9}$/, // UK special services: 08xxxxxxxxx (11 digits total)
   ];
 
   const isValidFormat = ukPatterns.some((pattern) => pattern.test(cleanPhone));
@@ -114,27 +124,23 @@ export function validateUKPhoneNumber(phone: string): ValidationResult {
     return {
       isValid: false,
       message:
-        "Please enter a valid UK phone number (e.g., 07123 456789 or 01234 567890)",
+        "Please enter a valid UK phone number starting with 0 (e.g., 07700 900456 or 01234 567890)",
     };
   }
 
-  // Check length after removing country code
-  let numberWithoutCountryCode = cleanPhone;
-  if (cleanPhone.startsWith("+44")) {
-    numberWithoutCountryCode = cleanPhone.substring(3);
-  } else if (cleanPhone.startsWith("0044")) {
-    numberWithoutCountryCode = cleanPhone.substring(4);
-  } else if (cleanPhone.startsWith("44")) {
-    numberWithoutCountryCode = cleanPhone.substring(2);
-  }
-
-  if (
-    numberWithoutCountryCode.length < 10 ||
-    numberWithoutCountryCode.length > 11
-  ) {
+  // Check specific length requirements
+  if (cleanPhone.startsWith("02") && cleanPhone.length !== 10) {
     return {
       isValid: false,
-      message: "UK phone number should be 10-11 digits long",
+      message:
+        "London numbers (02x) should be 10 digits long (e.g., 0207 123456)",
+    };
+  }
+
+  if (!cleanPhone.startsWith("02") && cleanPhone.length !== 11) {
+    return {
+      isValid: false,
+      message: "UK phone numbers should be 11 digits long (e.g., 07700 900456)",
     };
   }
 
@@ -184,24 +190,20 @@ export function validateName(
 export function formatUKPhoneNumber(phone: string): string {
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
 
-  // Handle different UK number formats
-  if (cleanPhone.startsWith("+44")) {
-    const number = cleanPhone.substring(3);
-    if (number.startsWith("7")) {
-      // Mobile: +44 7123 456789
-      return `+44 ${number.substring(0, 4)} ${number.substring(4)}`;
-    } else {
-      // Landline: +44 1234 567890
-      return `+44 ${number.substring(0, 4)} ${number.substring(4)}`;
-    }
-  } else if (cleanPhone.startsWith("0")) {
-    if (cleanPhone.startsWith("07")) {
-      // Mobile: 07123 456789
-      return `${cleanPhone.substring(0, 5)} ${cleanPhone.substring(5)}`;
-    } else {
-      // Landline: 01234 567890
-      return `${cleanPhone.substring(0, 5)} ${cleanPhone.substring(5)}`;
-    }
+  // Format UK numbers with leading 0
+  if (cleanPhone.startsWith("07")) {
+    // Mobile: 07700 900456
+    return `${cleanPhone.substring(0, 5)} ${cleanPhone.substring(5)}`;
+  } else if (cleanPhone.startsWith("02")) {
+    // London: 0207 123456 (10 digits total)
+    return `${cleanPhone.substring(0, 4)} ${cleanPhone.substring(4)}`;
+  } else if (
+    cleanPhone.startsWith("01") ||
+    cleanPhone.startsWith("03") ||
+    cleanPhone.startsWith("08")
+  ) {
+    // Other landlines/services: 01234 567890
+    return `${cleanPhone.substring(0, 5)} ${cleanPhone.substring(5)}`;
   }
 
   return phone; // Return original if no pattern matches
