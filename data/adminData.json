@@ -373,7 +373,7 @@
         "product": "Front Brakes (Discs & Pads)",
         "oemPartsPriceModifier": 10,
         "oemPartsModifierIsIncrease": true,
-        "examplePrice": 302.4,
+        "examplePrice": 275,
         "leadTimeEnabled": true,
         "leadTime": 1,
         "priceType": "EXAMPLE"
@@ -383,30 +383,30 @@
         "product": "Front Brakes (Pads)",
         "oemPartsPriceModifier": 10,
         "oemPartsModifierIsIncrease": true,
-        "examplePrice": 174,
+        "examplePrice": 130,
         "leadTimeEnabled": true,
         "leadTime": 1,
-        "priceType": "REVEAL"
+        "priceType": "EXAMPLE"
       },
       {
         "enabled": true,
         "product": "Rear Brakes (Discs & Pads)",
         "oemPartsPriceModifier": 10,
         "oemPartsModifierIsIncrease": true,
-        "examplePrice": 0,
+        "examplePrice": 240,
         "leadTimeEnabled": true,
         "leadTime": 1,
-        "priceType": "REVEAL"
+        "priceType": "EXAMPLE"
       },
       {
         "enabled": true,
         "product": "Rear Brakes (Pads)",
         "oemPartsPriceModifier": 10,
         "oemPartsModifierIsIncrease": true,
-        "examplePrice": 0,
+        "examplePrice": 110,
         "leadTimeEnabled": true,
         "leadTime": 1,
-        "priceType": "REVEAL"
+        "priceType": "EXAMPLE"
       },
       {
         "enabled": true,
@@ -425,5 +425,132 @@
     "monthlyRepaymentOptions": true,
     "servicePlanEligibilityCheck": true,
     "videoAuthorisation": false
+  },
+  "brakePricing": {
+    "description": "Average brake replacement prices by vehicle make based on BookMyGarage data (July 2022 - July 2024)",
+    "lastUpdated": "2024-07-01",
+    "frontBrakePads": {
+      "description": "Front brake pad replacement average prices by make",
+      "prices": {
+        "Audi": 155.75,
+        "BMW": 168.07,
+        "Citroen": 123.40,
+        "Fiat": 113.44,
+        "Ford": 136.97,
+        "Honda": 114.52,
+        "Hyundai": 102.84,
+        "Jaguar": 166.93,
+        "Kia": 101.95,
+        "Land Rover": 167.48,
+        "Mazda": 105.64,
+        "Mercedes-Benz": 116.26,
+        "MINI": 148.12,
+        "Mitsubishi": 134.91,
+        "Nissan": 102.58,
+        "Peugeot": 125.21,
+        "Renault": 100.14,
+        "SEAT": 123.78,
+        "Toyota": 112.03,
+        "Vauxhall": 132.29,
+        "Volkswagen": 136.61
+      }
+    },
+    "rearBrakePads": {
+      "description": "Rear brake pad replacement average prices by make",
+      "prices": {
+        "Audi": 123.93,
+        "BMW": 140.71,
+        "Citroen": 123.77,
+        "Fiat": 93.87,
+        "Ford": 124.84,
+        "Honda": 100.62,
+        "Hyundai": 86.60,
+        "Jaguar": 130.98,
+        "Kia": 89.19,
+        "Land Rover": 147.06,
+        "Mazda": 94.19,
+        "Mercedes-Benz": 114.46,
+        "MINI": 126.87,
+        "Mitsubishi": 134.85,
+        "Nissan": 92.19,
+        "Peugeot": 120.41,
+        "Renault": 111.96,
+        "SEAT": 105.33,
+        "Skoda": 108.39,
+        "Toyota": 91.54,
+        "Vauxhall": 123.52,
+        "Volkswagen": 117.39,
+        "Volvo": 118.97
+      }
+    },
+    "frontBrakesDiscAndPad": {
+      "description": "Front brake disc and pad replacement average prices by make",
+      "prices": {
+        "Audi": 333.66,
+        "BMW": 361.10,
+        "Citroen": 260.94,
+        "Fiat": 231.25,
+        "Ford": 266.42,
+        "Honda": 241.85,
+        "Hyundai": 246.75,
+        "Jaguar": 536.18,
+        "Kia": 250.47,
+        "Land Rover": 318.61,
+        "Mazda": 228.15,
+        "Mercedes-Benz": 272.76,
+        "MINI": 287.29,
+        "Mitsubishi": 317.20,
+        "Nissan": 215.24,
+        "Peugeot": 275.24,
+        "Renault": 287.44,
+        "SEAT": 247.82,
+        "Skoda": 257.05,
+        "Toyota": 229.79,
+        "Vauxhall": 296.76,
+        "Volkswagen": 271.59,
+        "Volvo": 273.78
+      }
+    },
+    "rearBrakesDiscAndPad": {
+      "description": "Rear brake disc and pad replacement average prices by make",
+      "prices": {
+        "Audi": 245.17,
+        "BMW": 298.58,
+        "Citroen": 250.39,
+        "Fiat": 176.01,
+        "Ford": 259.01,
+        "Honda": 209.75,
+        "Hyundai": 233.20,
+        "Jaguar": 301.64,
+        "Kia": 228.35,
+        "Land Rover": 281.10,
+        "Mazda": 235.06,
+        "Mercedes-Benz": 251.25,
+        "MINI": 218.36,
+        "Mitsubishi": 277.90,
+        "Nissan": 217.27,
+        "Peugeot": 289.01,
+        "Renault": 308.37,
+        "SEAT": 206.07,
+        "Skoda": 215.33,
+        "Toyota": 214.59,
+        "Vauxhall": 257.81,
+        "Volkswagen": 231.17,
+        "Volvo": 235.85
+      }
+    },
+    "notes": {
+      "dataSource": "BookMyGarage booking data July 2022 - July 2024",
+      "warningSignsTitle": "Signs you may need brake replacement:",
+      "warningSigns": [
+        "Squeaking or scraping sounds from brakes",
+        "Brake pedal feels spongy or soft",
+        "Vehicle pulls to one side when braking",
+        "Brake warning light on dashboard",
+        "Grinding noise when braking",
+        "Vibration in brake pedal or steering wheel"
+      ],
+      "recommendation": "Addressing brake problems quickly can help keep additional costs down. When replacing brake pads or discs, compare labour costs from local garages to find the best price."
+    }
   }
 }
