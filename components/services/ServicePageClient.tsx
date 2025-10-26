@@ -413,9 +413,9 @@ const ServicePageClient = ({
                     <Image
                       alt="Ignition Auto Care"
                       loading="eager"
-                      width={120}
-                      height={120}
-                      src={ignitionAutoCare}
+                      width={220}
+                      height={220}
+                      src='/logo.png'
                       className="mx-auto"
                       priority
                     />
@@ -454,6 +454,25 @@ const ServicePageClient = ({
                         180+ Reviews
                       </span>
                     </div>
+                    
+                    <div className="text-sm mb-1">
+                      <span className="cursor-help font-semibold">
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          className="w-4 h-4 inline-block align-[-0.125em] mr-1 text-[#0a65a3]"
+                          role="img"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 384 512"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M192 0c-41.8 0-77.4 26.7-90.5 64H64C28.7 64 0 92.7 0 128V448c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64h-37.5C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM305 273L177 401c-9.4 9.4-24.6 9.4-33.9 0L79 337c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L271 239c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+                          ></path>
+                        </svg>
+                        Trusted by 180+ customers — 5-star rated on Google and BookMyGarage!
+                      </span>
+                    </div>
                     <div className="text-sm mb-1">
                       <svg
                         aria-hidden="true"
@@ -472,24 +491,6 @@ const ServicePageClient = ({
                         Available
                         <span className="hidden md:inline"> from</span>:{" "}
                         {garageDetails.nextAvailable}
-                      </span>
-                    </div>
-                    <div className="text-sm mb-1">
-                      <span className="cursor-help font-semibold">
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          className="w-4 h-4 inline-block align-[-0.125em] mr-1 text-[#0a65a3]"
-                          role="img"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 384 512"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M192 0c-41.8 0-77.4 26.7-90.5 64H64C28.7 64 0 92.7 0 128V448c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64h-37.5C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM305 273L177 401c-9.4 9.4-24.6 9.4-33.9 0L79 337c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L271 239c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
-                          ></path>
-                        </svg>
-                        Trusted by 180+ customers — 5-star rated on Google and BookMyGarage!
                       </span>
                     </div>
                     <div className="text-sm mb-1">
@@ -737,7 +738,7 @@ const ServicePageClient = ({
             </div>
 
             {/* Customer Reviews */}
-            <div className="bg-white p-6 rounded-lg">
+            {/* <div className="bg-white p-6 rounded-lg">
               <h3 className="text-2xl font-extrabold">Customer Reviews</h3>
               <div className="mt-4 flex flex-col sm:flex-row gap-8">
                 <div className="w-full sm:w-1/2 flex flex-col">
@@ -792,10 +793,10 @@ const ServicePageClient = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Lazy load reviews slider */}
-            <div className="my-8">
+            <div className="my-8">  
               <Suspense
                 fallback={
                   <div className="h-64 bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
