@@ -14,7 +14,13 @@ import { AvailableSlot, CreateBookingRequest } from "@/types/booking";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { validateCustomerDetails, formatUKPhoneNumber, validateEmail, validateName, validateUKPhoneNumber } from "@/lib/validation";
+import {
+  validateCustomerDetails,
+  formatUKPhoneNumber,
+  validateEmail,
+  validateName,
+  validateUKPhoneNumber,
+} from "@/lib/validation";
 import BookingSummary from "./BookingSummary";
 const ConfirmationPageClient = () => {
   const {
@@ -145,7 +151,7 @@ const ConfirmationPageClient = () => {
 
       // Real-time validation for each field
       const newErrors = { ...validationErrors };
-      
+
       if (name === "firstName") {
         const validation = validateName(value, "First name");
         if (!validation.isValid && value.trim().length > 0) {
@@ -176,7 +182,7 @@ const ConfirmationPageClient = () => {
           delete newErrors.contactNumber;
         }
       }
-      
+
       setValidationErrors(newErrors);
     } else if (name === "notes") {
       setNotes(value);
@@ -380,8 +386,8 @@ const ConfirmationPageClient = () => {
                     <Label className="text-base font-medium mb-4 block">
                       Select a date
                     </Label>
-                    <div className="flex justify-center lg:justify-start px-2 lg:px-0">
-                      <div className="w-full max-w-[300px] lg:max-w-none">
+                    <div className="flex justify-center lg:justify-start">
+                      <div className="w-full max-w-[320px] lg:max-w-none overflow-hidden">
                         <Calendar
                           mode="single"
                           selected={selectedDate}
@@ -394,7 +400,29 @@ const ConfirmationPageClient = () => {
                             const dateString = date.toISOString().split("T")[0];
                             return !availableDates.has(dateString);
                           }}
-                          className="rounded-md border w-full mx-auto lg:mx-0 scale-90 sm:scale-100"
+                          className="rounded-md border w-full mx-auto lg:mx-0 text-sm"
+                          classNames={{
+                            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                            month: "space-y-4",
+                            caption: "flex justify-center pt-1 relative items-center px-1",
+                            caption_label: "text-sm font-medium",
+                            nav: "space-x-1 flex items-center",
+                            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                            nav_button_previous: "absolute left-1",
+                            nav_button_next: "absolute right-1",
+                            table: "w-full border-collapse space-y-1",
+                            head_row: "flex",
+                            head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem] flex-1 text-center",
+                            row: "flex w-full mt-2",
+                            cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 flex-1",
+                            day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground mx-auto rounded-md",
+                            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                            day_today: "bg-accent text-accent-foreground",
+                            day_outside: "text-muted-foreground opacity-50",
+                            day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
+                            day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                            day_hidden: "invisible",
+                          }}
                         />
                       </div>
                     </div>
@@ -553,6 +581,7 @@ const ConfirmationPageClient = () => {
                 <Input
                   id="contactNumber"
                   name="contactNumber"
+                  type="tel"
                   value={customerDetails.contactNumber}
                   onChange={handleInputChange}
                   onBlur={handlePhoneBlur}
