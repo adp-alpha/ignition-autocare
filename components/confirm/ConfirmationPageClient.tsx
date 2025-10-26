@@ -324,8 +324,8 @@ const ConfirmationPageClient = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 lg:px-52">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="container mx-auto py-8 px-4 lg:px-52 safari-container">
+      <div className="safari-main-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left and Center Columns for form content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Vehicle Header */}
@@ -387,7 +387,7 @@ const ConfirmationPageClient = () => {
                       Select a date
                     </Label>
                     <div className="flex justify-center lg:justify-start">
-                      <div className="w-full max-w-[320px] lg:max-w-none overflow-hidden">
+                      <div className="w-full max-w-[320px] lg:max-w-none overflow-hidden safari-calendar-container">
                         <Calendar
                           mode="single"
                           selected={selectedDate}
@@ -400,22 +400,22 @@ const ConfirmationPageClient = () => {
                             const dateString = date.toISOString().split("T")[0];
                             return !availableDates.has(dateString);
                           }}
-                          className="rounded-md border w-full mx-auto lg:mx-0 text-sm"
+                          className="rounded-md border w-full mx-auto lg:mx-0 text-sm safari-calendar"
                           classNames={{
                             months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                            month: "space-y-4",
-                            caption: "flex justify-center pt-1 relative items-center px-1",
-                            caption_label: "text-sm font-medium",
+                            month: "space-y-4 w-full",
+                            caption: "flex justify-center pt-1 relative items-center px-1 min-h-[2.5rem]",
+                            caption_label: "text-sm font-medium select-none",
                             nav: "space-x-1 flex items-center",
-                            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                            nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 touch-manipulation flex items-center justify-center",
                             nav_button_previous: "absolute left-1",
                             nav_button_next: "absolute right-1",
                             table: "w-full border-collapse space-y-1",
-                            head_row: "flex",
-                            head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem] flex-1 text-center",
+                            head_row: "flex w-full",
+                            head_cell: "text-muted-foreground rounded-md font-normal text-[0.8rem] flex-1 text-center min-w-[2rem] p-1",
                             row: "flex w-full mt-2",
-                            cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 flex-1",
-                            day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground mx-auto rounded-md",
+                            cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 flex-1 min-w-[2rem]",
+                            day: "h-8 w-8 min-w-[2rem] min-h-[2rem] p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground mx-auto rounded-md touch-manipulation flex items-center justify-center",
                             day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                             day_today: "bg-accent text-accent-foreground",
                             day_outside: "text-muted-foreground opacity-50",
@@ -438,7 +438,7 @@ const ConfirmationPageClient = () => {
                         <div className="space-y-3">
                           <ToggleGroup
                             type="single"
-                            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 w-full"
+                            className="safari-toggle-group grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 w-full"
                             value={selectedSlot?.id}
                             onValueChange={(value: string) => {
                               const slot = availableTimeSlots.find(
@@ -453,7 +453,7 @@ const ConfirmationPageClient = () => {
                                 value={slot.id}
                                 aria-label={`Toggle ${slot.displayTime}`}
                                 disabled={slot.availableCapacity === 0}
-                                className="w-full text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 min-h-[40px] sm:min-h-[44px] justify-center"
+                                className="safari-toggle-item w-full text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 min-h-[44px] justify-center touch-manipulation"
                               >
                                 {slot.displayTime}
                               </ToggleGroupItem>
@@ -521,8 +521,8 @@ const ConfirmationPageClient = () => {
                   onChange={handleInputChange}
                   className={
                     validationErrors.firstName
-                      ? "border-red-500 focus:border-red-500"
-                      : ""
+                      ? "border-red-500 focus:border-red-500 safari-input"
+                      : "safari-input"
                   }
                   placeholder="Enter your first name"
                   required
@@ -542,8 +542,8 @@ const ConfirmationPageClient = () => {
                   onChange={handleInputChange}
                   className={
                     validationErrors.lastName
-                      ? "border-red-500 focus:border-red-500"
-                      : ""
+                      ? "border-red-500 focus:border-red-500 safari-input"
+                      : "safari-input"
                   }
                   placeholder="Enter your last name"
                   required
@@ -564,8 +564,8 @@ const ConfirmationPageClient = () => {
                   onChange={handleInputChange}
                   className={
                     validationErrors.email
-                      ? "border-red-500 focus:border-red-500"
-                      : ""
+                      ? "border-red-500 focus:border-red-500 safari-input"
+                      : "safari-input"
                   }
                   placeholder="your.email@example.com"
                   required
@@ -587,8 +587,8 @@ const ConfirmationPageClient = () => {
                   onBlur={handlePhoneBlur}
                   className={
                     validationErrors.contactNumber
-                      ? "border-red-500 focus:border-red-500"
-                      : ""
+                      ? "border-red-500 focus:border-red-500 safari-input"
+                      : "safari-input"
                   }
                   placeholder="07123 456789 or 01234 567890"
                   required
@@ -613,6 +613,7 @@ const ConfirmationPageClient = () => {
               value={notes}
               onChange={handleInputChange}
               placeholder="Let the garage know about any specific issues..."
+              className="safari-input"
             />
           </div>
 

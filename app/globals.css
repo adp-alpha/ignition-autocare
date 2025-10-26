@@ -143,3 +143,309 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* Safari and iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Safari-specific calendar fixes */
+  .safari-calendar-container {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  .safari-calendar {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .safari-calendar button {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  
+  /* Fix flexbox issues in Safari */
+  .safari-calendar [class*="flex"] {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+  }
+  
+  /* Ensure proper touch targets on iOS */
+  .safari-calendar button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Fix calendar day button sizing in Safari */
+  .safari-calendar [data-slot="calendar"] button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 2rem;
+    min-width: 2rem;
+  }
+}
+
+/* iOS specific fixes */
+@supports (-webkit-overflow-scrolling: touch) {
+  /* Smooth scrolling for iOS */
+  .container {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix input zoom on iOS */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  
+  /* Prevent iOS zoom on form inputs */
+  @media screen and (max-width: 767px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Additional mobile Safari fixes */
+@media screen and (max-width: 768px) {
+  /* Ensure calendar is properly sized on mobile */
+  .safari-calendar-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+  
+  .safari-calendar {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  
+  /* Fix toggle group layout on mobile Safari */
+  .safari-toggle-group {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+  
+  .safari-toggle-item {
+    width: 100% !important;
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Ensure proper touch feedback */
+  .safari-toggle-item:active {
+    transform: scale(0.98);
+  }
+  
+  /* Fix grid layout issues in Safari */
+  .container .grid {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  
+  @media (min-width: 1024px) {
+    .container .lg\\:grid {
+      display: -ms-grid;
+      display: grid;
+    }
+  }
+}
+
+/* Safari desktop fixes */
+@media screen and (min-width: 769px) {
+  .safari-calendar {
+    max-width: none;
+  }
+  
+  .safari-toggle-group {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    .safari-toggle-group {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .safari-toggle-group {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+/* Fix for Safari date picker issues */
+.safari-calendar [data-slot="calendar"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+.safari-calendar table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.safari-calendar td {
+  width: 14.28571429%; /* 100% / 7 days */
+  position: relative;
+}
+
+/* Improve button accessibility on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .safari-toggle-item:hover {
+    background-color: initial;
+  }
+  
+  .safari-toggle-item:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+/* Safari container and layout fixes */
+.safari-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+}
+
+.safari-main-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .safari-main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Safari input fixes */
+.safari-input {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0.375rem;
+  border-radius: 0.375rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safari-input:focus {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Fix for Safari sticky positioning */
+@supports (-webkit-sticky: sticky) or (position: sticky) {
+  .sticky {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+
+/* Additional Safari flexbox fixes */
+.safari-main-grid > div {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+/* Fix Safari button rendering */
+button {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0.375rem;
+  border-radius: 0.375rem;
+}
+
+/* Ensure proper spacing on Safari */
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+/* Safari booking summary fixes */
+.safari-booking-summary {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@media screen and (max-width: 1023px) {
+  .safari-booking-summary {
+    position: relative !important;
+    top: auto !important;
+    margin-top: 2rem;
+  }
+}
+
+/* Fix checkbox styling in Safari */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  background-color: white;
+  position: relative;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+}

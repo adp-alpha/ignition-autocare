@@ -46,7 +46,7 @@ const BookingSummary = () => {
   const selectedServiceDetails = allServices.filter(service => selectedServices.includes(service.id));
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md sticky top-8">
+    <div className="bg-white p-6 rounded-lg shadow-md sticky top-8 safari-booking-summary">
       <div className="flex justify-between items-center border-b pb-4">
         <h2 className="text-lg font-bold">Booking Summary</h2>
         <button

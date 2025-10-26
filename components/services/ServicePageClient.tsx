@@ -12,7 +12,6 @@ import { useBooking } from "@/lib/context/BookingContext";
 import { FormattedPricingData, ServiceItem } from "@/lib/pricing-engine";
 import { MotHistoryData, VehicleData } from "@/types/vehicleData";
 import { Check, Dot } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   lazy,
@@ -31,6 +30,8 @@ import {
   RenderStars,
   StarIcon,
 } from "./component";
+import Image from 'next/image'
+
 
 // Lazy load heavy components
 const ReviewSlider = lazy(() => import("@/components/reviews/ReviewSlider"));
@@ -450,7 +451,7 @@ const ServicePageClient = ({
                         ))}
                       </div>
                       <span className="ml-2 text-sm align-top">
-                        {garageDetails.reviews} Reviews
+                        180+ Reviews
                       </span>
                     </div>
                     <div className="text-sm mb-1">
@@ -488,7 +489,7 @@ const ServicePageClient = ({
                             d="M192 0c-41.8 0-77.4 26.7-90.5 64H64C28.7 64 0 92.7 0 128V448c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64h-37.5C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM305 273L177 401c-9.4 9.4-24.6 9.4-33.9 0L79 337c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L271 239c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
                           ></path>
                         </svg>
-                        BookMyGarage Verified
+                        Trusted by 180+ customers — 5-star rated on Google and BookMyGarage!
                       </span>
                     </div>
                     <div className="text-sm mb-1">
@@ -505,7 +506,7 @@ const ServicePageClient = ({
                           d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
                         ></path>
                       </svg>
-                      <span>Customer Drop-off Bookable</span>
+                      <span>Free Pickup and Drop-off</span>
                     </div>
                     <div className="hidden sm:flex flex-col flex-wrap -ml-1">
                       {garageDetails.banners.map((banner, index) => (
@@ -542,17 +543,16 @@ const ServicePageClient = ({
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-col h-full items-center justify-center my-auto">
+                  {/* <div className="flex flex-col h-full items-center justify-center my-auto">
                     <Image
-                      src={silverTierBadge}
+                      src='/logo.png'
                       alt="silver tier badge"
                       className="scale-125"
                       priority
+                      width={50}
+                      height={50}
                     />
-                    <span className="text-base text-center text-gray-600 font-light mt-3">
-                      Silver Tier
-                    </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -634,40 +634,62 @@ const ServicePageClient = ({
             </div>
 
             <div className="bg-white p-6 rounded-lg space-y-6">
+             <div className="p-8 rounded-lg flex flex-col items-center space-y-6 text-center">
+  {/* Header */}
+  <h2 className="text-2xl font-semibold tracking-wide">
+    Where to find us
+  </h2>
+
+  {/* Image Section */}
+  <div className="rounded-lg overflow-hidden border border-gray-700 shadow-lg">
+    <Image
+      src="/location.png"
+      alt="Ignition Autocare Location"
+      width={800}
+      height={600}
+      className="object-cover"
+    />
+  </div>
+
+  {/* Address Section */}
+  <div className="space-y-2">
+    <h3 className="text-xl font-bold">Ignition Autocare</h3>
+    <p>Colorado Way,</p>
+    <p>Castleford,</p>
+    <p>WF10 4TA</p>
+  </div>
+
+  {/* Contact Info */}
+  <div className="space-y-2">
+    <div className="flex justify-center gap-4">
+      <a
+        href="https://instagram.com"
+        className="text-white hover:text-gray-300 transition"
+      >
+        <i className="fab fa-instagram text-2xl"></i>
+      </a>
+      <a
+        href="https://facebook.com"
+        className="text-white hover:text-gray-300 transition"
+      >
+        <i className="fab fa-facebook text-2xl"></i>
+      </a>
+    </div>
+    <p className="text-lg font-medium">01977 807050</p>
+    <p className="text-lg">
+      <a
+        href="https://www.ignitionautocare.uk"
+        className="underline hover:text-gray-300"
+      >
+        www.ignitionautocare.uk
+      </a>
+    </p>
+  </div>
+</div>
+
               <div>
-                <div className="flex items-center gap-3">
-                  <LocationIcon className="w-6 h-6 text-gray-800" />
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Garage Address
-                  </h3>
-                </div>
-                <div className="mt-3 text-base text-gray-600 leading-relaxed">
-                  <p>{garageDetails.address.line1}</p>
-                  <p>{garageDetails.address.line2}</p>
-                  <p>{garageDetails.address.town}</p>
-                  <p>{garageDetails.address.county}</p>
-                  <p>{garageDetails.address.postcode}</p>
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <CalendarIcon className="w-6 h-6 text-gray-800" />
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Opening hours
-                  </h3>
-                </div>
-                <div className="mt-3 space-y-2 text-base">
-                  {Object.entries(garageDetails.openingHours).map(
-                    ([day, hours]) => (
-                      <div key={day} className="flex justify-between">
-                        <span className="font-bold text-gray-800 capitalize">
-                          {day}:
-                        </span>
-                        <span className="text-gray-600">{hours}</span>
-                      </div>
-                    )
-                  )}
-                </div>
+               
+                
               </div>
             </div>
           </div>
