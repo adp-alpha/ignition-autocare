@@ -8,29 +8,47 @@ interface BookingEmailData {
 }
 
 /**
- * Create email transporter
+ * Create email transporter with SendGrid priority
  */
 function createTransporter() {
-  // Check if email credentials are configured
-  if (!process.env.SMTP_EMAIL_USER || !process.env.SMTP_EMAIL_PASS) {
-    console.warn(
-      "⚠️ Email credentials not configured - emails will be skipped"
-    );
-    return null;
+  // Priority 1: SendGrid (most reliable)
+  if (process.env.SENDGRID_API_KEY) {
+    console.log("📧 Using SendGrid for email delivery");
+    return nodemailer.createTransport({
+      host: "smtp.sendgrid.net",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: "apikey", // This is literally the string "apikey"
+        pass: process.env.SENDGRID_API_KEY, // Your SendGrid API key
+      },
+      // Anti-spam configurations
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 10,
+    });
   }
 
-  // DigitalOcean-optimized SMTP configuration
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.SMTP_EMAIL_USER,
-      pass: process.env.SMTP_EMAIL_PASS,
-    },
-    // Anti-spam configurations
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 10,
-  });
+  // Priority 2: Gmail SMTP (fallback)
+  if (process.env.SMTP_EMAIL_USER && process.env.SMTP_EMAIL_PASS) {
+    console.log("📧 Using Gmail SMTP for email delivery");
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_EMAIL_USER,
+        pass: process.env.SMTP_EMAIL_PASS,
+      },
+      // Anti-spam configurations
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 10,
+    });
+  }
+
+  console.warn(
+    "⚠️ No email credentials configured - emails will be skipped"
+  );
+  return null;
 }
 
 /**

@@ -16,18 +16,21 @@ interface EmailConfig {
 function getEmailConfigurations(): EmailConfig[] {
   const configs: EmailConfig[] = [];
 
-  // SendGrid (most reliable for production)
+  // SendGrid (most reliable for production) - PRIORITY
   if (process.env.SENDGRID_API_KEY) {
     configs.push({
-      name: 'SendGrid',
+      name: 'SendGrid SMTP',
       config: {
         host: "smtp.sendgrid.net",
         port: 587,
         secure: false,
         auth: {
-          user: "apikey",
+          user: "apikey", // This is literally the string "apikey"
           pass: process.env.SENDGRID_API_KEY,
         },
+        tls: {
+          rejectUnauthorized: false
+        }
       }
     });
   }

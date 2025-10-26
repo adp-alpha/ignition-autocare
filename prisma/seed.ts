@@ -1,17 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { adminDataSchema } from '../lib/validations/admin-data';
+import { PrismaClient } from "@prisma/client";
+import { promises as fs } from "fs";
+import path from "path";
+import { adminDataSchema } from "../lib/validations/admin-data";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Starting database seed...');
+  console.log("Starting database seed...");
 
   try {
     // Read the JSON file
-    const jsonFilePath = path.join(process.cwd(), 'data', 'adminData.json');
-    const fileContents = await fs.readFile(jsonFilePath, 'utf8');
+    const jsonFilePath = path.join(process.cwd(), "data", "adminData.json");
+    const fileContents = await fs.readFile(jsonFilePath, "utf8");
     const jsonData = JSON.parse(fileContents);
 
     // Validate the data
@@ -21,7 +21,7 @@ async function main() {
     const existingData = await prisma.adminData.findFirst();
 
     if (existingData) {
-      console.log('Admin data already exists. Updating...');
+      console.log("Admin data already exists. Updating...");
       await prisma.adminData.update({
         where: { id: existingData.id },
         data: {
@@ -40,9 +40,9 @@ async function main() {
           offersAndExtras: validatedData.offersAndExtras,
         },
       });
-      console.log('Admin data updated successfully!');
+      console.log("Admin data updated successfully!");
     } else {
-      console.log('Creating new admin data...');
+      console.log("Creating new admin data...");
       await prisma.adminData.create({
         data: {
           defaultLeadTime: validatedData.defaultLeadTime,
@@ -60,12 +60,12 @@ async function main() {
           offersAndExtras: validatedData.offersAndExtras,
         },
       });
-      console.log('Admin data created successfully!');
+      console.log("Admin data created successfully!");
     }
 
-    console.log('Database seed completed successfully!');
+    console.log("Database seed completed successfully!");
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error("Error seeding database:", error);
     throw error;
   }
 }
