@@ -293,7 +293,7 @@ const ConfirmationPageClient = () => {
       );
 
       // Optionally redirect to a success page or clear the form
-      // window.location.href = `/booking-success?ref=${result.bookingReference}`;
+      window.location.href = `https://ignitionautocare.uk/thank-you/`;
     } catch (error) {
       console.error("Error creating booking:", error);
       setSubmitError(
